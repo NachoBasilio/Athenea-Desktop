@@ -1,4 +1,4 @@
-# 👥 Pricut Dashboard - App de escritorio con Preact + Vite + Electron
+# 👥 Athenea - App de escritorio con Preact + Vite + Electron
 
 Esta es una aplicación de escritorio construida con:
 
@@ -12,18 +12,23 @@ Esta es una aplicación de escritorio construida con:
 ## 🚀 Scripts disponibles
 
 ### `npm run dev`
+
 Corre solo el frontend (Vite) en el navegador. Últil para desarrollo web.
 
 ### `npm run dev:electron`
+
 Corre Vite **y** Electron al mismo tiempo. Ideal para desarrollo de escritorio.
 
 ### `npm run build`
+
 Genera los archivos de frontend en `dist/` listos para producción.
 
 ### `npm run electron`
+
 Lanza la app de escritorio usando los archivos del build. Asegurate de correr `npm run build` primero.
 
 ### `npm run dist`
+
 Empaqueta la app para distribución (genera instaladores como `.exe`, `.AppImage`, `.dmg`, etc.)
 
 ---
