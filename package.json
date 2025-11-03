@@ -1,0 +1,58 @@
+{
+	"name": "pricutdashboar",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"main": "electron.js",
+	"scripts": {
+		"dev": "vite --port 5171 --strictPort",
+		"electron": "electron . --no-sandbox",
+		"dev:electron": "concurrently -k \"vite --port 5171 --strictPort\" \"wait-on http://localhost:5171 && electron . --no-sandbox\"",
+		"build": "vite build && cp preload.js dist/",
+		"preview": "vite preview",
+		"pack": "electron-builder --dir",
+		"dist": "npm run build && electron-builder"
+	},
+	"dependencies": {
+		"jwt-decode": "^4.0.0",
+		"preact": "^10.26.2",
+		"preact-iso": "^2.9.1",
+		"zustand": "^5.0.3"
+	},
+	"devDependencies": {
+		"@preact/preset-vite": "^2.10.1",
+		"concurrently": "^8.2.0",
+		"electron": "^35.1.4",
+		"electron-builder": "^24.13.1",
+		"vite": "^6.2.0",
+		"wait-on": "^7.0.1"
+	},
+	"build": {
+		"appId": "com.pricut.dashboar",
+		"productName": "Pricut Dashboard",
+		"files": [
+			"dist/**/*",
+			"electron.js",
+			"preload.js",
+			"package.json"
+		],
+		"extraResources": [
+			{
+				"from": "dist/binaries",
+				"to": "binaries",
+				"filter": [
+					"**/*"
+				]
+			}
+		],
+		"directories": {
+			"buildResources": "assets"
+		},
+		"extraMetadata": {
+			"main": "electron.js"
+		},
+		"win": {
+			"signAndEditExecutable": false
+		}
+	}
+}
