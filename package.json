@@ -1,7 +1,7 @@
 {
-	"name": "pricutdashboar",
+	"name": "pricut-dashboard",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"type": "module",
 	"main": "electron.js",
 	"scripts": {
@@ -11,25 +11,56 @@
 		"build": "vite build && cp preload.js dist/",
 		"preview": "vite preview",
 		"pack": "electron-builder --dir",
-		"dist": "npm run build && electron-builder"
+		"dist": "npm run build && electron-builder",
+		"lint": "eslint .",
+		"format": "prettier --write .",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest",
+		"postinstall": "electron-builder install-app-deps"
 	},
 	"dependencies": {
+		"axios": "^1.7.7",
+		"dayjs": "^1.11.13",
 		"jwt-decode": "^4.0.0",
+		"keytar": "7.9.0",
+		"ky": "^1.2.4",
 		"preact": "^10.26.2",
 		"preact-iso": "^2.9.1",
+		"zod": "^3.23.8",
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.10.1",
+		"@testing-library/preact": "3.2.3",
+		"@types/node": "^22.7.8",
+		"autoprefixer": "^10.4.20",
 		"concurrently": "^8.2.0",
+		"cross-env": "^7.0.3",
+		"dotenv": "^16.4.5",
 		"electron": "^35.1.4",
 		"electron-builder": "^24.13.1",
+		"electron-log": "^5.4.3",
+		"electron-updater": "^6.6.2",
+		"eslint": "^9.10.0",
+		"eslint-config-preact": "^2.0.0",
+		"eslint-config-prettier": "^9.1.0",
+		"pdf-to-printer": "5.6.1",
+		"postcss": "^8.4.47",
+		"prettier": "^3.3.3",
+		"tailwindcss": "^3.4.14",
+		"typescript": "^5.6.3",
 		"vite": "^6.2.0",
+		"vite-tsconfig-paths": "^5.0.0",
+		"vitest": "^4.0.8",
 		"wait-on": "^7.0.1"
 	},
 	"build": {
-		"appId": "com.pricut.dashboar",
+		"appId": "com.pricut.dashboard",
 		"productName": "Pricut Dashboard",
+		"asar": true,
+		"asarUnpack": [
+			"**/*.node"
+		],
 		"files": [
 			"dist/**/*",
 			"electron.js",
@@ -51,8 +82,24 @@
 		"extraMetadata": {
 			"main": "electron.js"
 		},
+		"publish": [
+			{
+				"provider": "generic",
+				"url": "https://updates.tuapp.com/"
+			}
+		],
 		"win": {
+			"target": [
+				"nsis"
+			],
 			"signAndEditExecutable": false
+		},
+		"nsis": {
+			"oneClick": false,
+			"perMachine": true,
+			"allowToChangeInstallationDirectory": true,
+			"createDesktopShortcut": true,
+			"createStartMenuShortcut": true
 		}
 	}
 }
