@@ -268,5 +268,3 @@ Este proyecto es privado. Ver `LICENSE` para más información.
 - 📧 Email: soporte@tuapp.com
 
 ---
-
-<p align="center">Hecho con ❤️ para Pricut Dashboard</p>
