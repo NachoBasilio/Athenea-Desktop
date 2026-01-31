@@ -103,6 +103,7 @@ const settingsPath = path.join(app.getPath('userData'), 'settings.json')
 /** Crea ventana principal, carga renderer y sincroniza eventos hijo/padre. */
 function createWindow() {
 	const isDev = !app.isPackaged
+	const devServerUrl = process.env.DEV_SERVER_URL || 'http://localhost:5171'
 
 	// Debug logs
 	log.info('🔍 isDev:', isDev)
@@ -131,7 +132,7 @@ function createWindow() {
 	mainWindow.maximize()
 
 	if (isDev) {
-		mainWindow.loadURL('http://localhost:5171')
+		mainWindow.loadURL(devServerUrl)
 		mainWindow.webContents.openDevTools()
 	} else {
 		const indexPath = path.join(__dirname, 'dist', 'index.html')
@@ -517,7 +518,7 @@ ipcMain.on('window:openRoute', (_event, options) => {
 	childWindowsByRoute.set(routeKey, child)
 
 	if (isDev) {
-		const devUrl = `http://localhost:5171/?route=${encodeURIComponent(route)}&child=1`
+		const devUrl = `${devServerUrl}?route=${encodeURIComponent(route)}&child=1`
 		log.info('🔍 Loading child window (dev):', devUrl)
 		child.loadURL(devUrl)
 		child.webContents.openDevTools()

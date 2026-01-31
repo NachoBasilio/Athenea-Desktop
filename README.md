@@ -45,13 +45,13 @@ Aplicación de escritorio con Electron + Preact, empaquetada con electron-builde
 ### Desarrollo
 
 ```bash
-# Ejecutar solo frontend en navegador (modo web)
+# Ejecutar solo frontend en navegador (modo web, puerto aleatorio)
 npm run dev
 
-# Ejecutar app completa de escritorio con hot-reload (Electron + Vite)
+# Ejecutar app completa de escritorio con hot-reload (Electron + Vite, puerto aleatorio)
 npm run dev:electron
 
-# Variante Windows (usa electron:wait)
+# Variante Windows (mismo script)
 npm run dev:electron:win
 
 # Ejecutar solo Electron (requiere build previo)
