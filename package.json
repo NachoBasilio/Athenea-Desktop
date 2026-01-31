@@ -88,15 +88,7 @@
       "buildResources": "assets",
       "output": "../release"
     },
-    "extraResources": [
-      {
-        "from": "../backend/dist/api_billing_software",
-        "to": "api_billing_software",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
+    "extraResources": [],
     "files": [
       "dist/**/*",
       "electron.js",

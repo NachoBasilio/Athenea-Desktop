@@ -211,7 +211,8 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 
 ## 📦 Recursos empaquetados
 
-- Si necesitás incluir binarios o archivos externos, configuralos en `build.extraResources` en `package.json`.
+- Por defecto no se incluye ningún recurso extra.
+- Si necesitás sumar binarios o archivos externos, configuralos en `build.extraResources` en `package.json`.
 - Mantené esos recursos fuera del repositorio si son generados o sensibles y copiá las versiones necesarias antes de `npm run dist` o `npm run pack`.
 
 ## 🧰 Troubleshooting
@@ -273,5 +274,6 @@ Repositorio público pensado como plantilla. Definí y agregá tu `LICENSE` ante
 
 - 🐛 Reportá bugs en [Issues](https://github.com/NachoBasilio/Athenea-Desktop/issues)
 - 💬 Discusiones en [Discussions](https://github.com/NachoBasilio/Athenea-Desktop/discussions)
+- 📧 Email: ignacio.n.basilio.b@gmail.com
 
 ---
