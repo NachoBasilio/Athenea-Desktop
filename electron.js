@@ -20,6 +20,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Deshabilitar features que causan warnings innecesarios
 app.commandLine.appendSwitch('disable-features', 'Autofill')
 
+// En dev (o si viene seteado), deshabilitar sandbox para evitar issues de permisos en Linux
+if (!app.isPackaged || process.env.ELECTRON_DISABLE_SANDBOX === '1') {
+	app.commandLine.appendSwitch('no-sandbox')
+}
+
 // ------------------- BACKEND MANAGER -------------------
 
 let backendProcess = null

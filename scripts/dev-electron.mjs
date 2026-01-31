@@ -23,13 +23,14 @@ async function start() {
 
 	const electronProcess = spawn(
 		'electron',
-		['.'],
+		['.', '--no-sandbox'],
 		{
 			stdio: 'inherit',
 			env: {
 				...process.env,
 				DEV_SERVER_URL: url,
 				NODE_OPTIONS: "--experimental-require-module --no-warnings",
+				ELECTRON_DISABLE_SANDBOX: '1',
 			},
 			cwd: path.resolve(__dirname, '..'),
 		}

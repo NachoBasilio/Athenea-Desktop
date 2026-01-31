@@ -54,6 +54,8 @@ npm run dev:electron
 # Variante Windows (mismo script)
 npm run dev:electron:win
 
+# Nota Linux: el script arranca Electron con --no-sandbox para evitar el error de chrome-sandbox
+
 # Ejecutar solo Electron (requiere build previo)
 npm run electron
 ```
@@ -198,6 +200,7 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 - **Context isolation:** Habilitado para proteger el proceso renderer
 - **Preload script:** Expone solo APIs necesarias de forma controlada (window.electronAPI)
 - **Code signing:** Configurado para Windows (ajustar según necesidad)
+- **Sandbox en dev:** Se deshabilita en desarrollo para evitar problemas de permisos (chrome-sandbox). En producción se mantiene por defecto.
 
 ---
 
