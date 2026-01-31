@@ -1,6 +1,6 @@
 # 👥 Athenea - Dashboard Desktop App
 
-Aplicación de escritorio con Electron + Preact, empaquetada con electron-builder e integrada con backend local (binario incluido en `build/extraResources`).
+Plantilla pública lista para usar como base de app de escritorio con Electron + Preact, empaquetada con electron-builder.
 
 ## 🛠️ Stack Tecnológico
 
@@ -10,12 +10,11 @@ Aplicación de escritorio con Electron + Preact, empaquetada con electron-builde
 - ⚡ **[Vite](https://vitejs.dev/)** - Build tool ultrarrápido con HMR instantáneo
 - 🖥️ **[Electron](https://www.electronjs.org/)** - Framework para apps de escritorio multiplataforma
 - 📦 **[electron-builder](https://www.electron.build/)** - Empaquetado y distribución
- - 🧰 **Backend incluido** - Binario `api_billing_software` se copia al build final
 
 ### Gestión de Estado y Datos
 
 - 🐻 **[Zustand](https://zustand-demo.pmnd.rs/)** - State management minimalista (1KB)
-- 🌐 **[Axios](https://axios-http.com/)** & **[Ky](https://github.com/sindresorhus/ky)** - HTTP clients
+- 🌐 **[Ky](https://github.com/sindresorhus/ky)** - HTTP client ligero
 - 🔐 **[Keytar](https://github.com/atom/node-keytar)** - Almacenamiento seguro de credenciales
 - 🎯 **[Zod](https://zod.dev/)** - Validación de schemas TypeScript-first
 - 🔑 **[jwt-decode](https://github.com/auth0/jwt-decode)** - Decodificación de tokens JWT
@@ -102,7 +101,7 @@ npm run test
 
 ### Requisitos Previos
 
-- **Node.js** v22.0.0 o superior (requerido)
+- **Node.js** v22.0.0 o superior (requerido). Usamos Node 22 para alinear con Electron 35 y evitar rebuilds de nativos. Incluimos `.nvmrc` y `.node-version` para fijar versión.
 - **npm** v8.0.0 o superior
 - **Git** (recomendado)
 
@@ -110,8 +109,8 @@ npm run test
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/athenea.git
-cd athenea
+git clone https://github.com/NachoBasilio/Athenea-Desktop.git
+cd Athenea-Desktop
 
 # 2. Instalar dependencias
 npm install
@@ -184,9 +183,8 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 │   ├── stores/           # Stores de Zustand
 │   ├── utils/            # Utilidades y helpers
 │   └── main.jsx          # Entry point
-├── electron.js           # Proceso principal de Electron (maneja backend y ventanas hijas)
+├── electron.js           # Proceso principal de Electron (maneja ventanas hijas)
 ├── preload.cjs           # Script de preload (bridge seguro expuesto como electronAPI)
-├── backend/dist/api_billing_software/  # Binario local empaquetado (dev)
 ├── assets/               # Recursos para el instalador (iconos, sidebars)
 ├── dist/                 # Build de producción (frontend + preload copiado)
 └── package.json          # Dependencias y scripts
@@ -206,11 +204,15 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 
 ## 🚢 Distribución y Updates
 
-- El build coloca los binarios en `../release`.
-- El backend `api_billing_software` se incluye automáticamente desde `backend/dist` en `extraResources`.
+- El build coloca los artefactos en `../release`.
 - `electron-updater` está disponible; configurá `publish` en `package.json` si vas a usar updates.
 
 ---
+
+## 📦 Recursos empaquetados
+
+- Si necesitás incluir binarios o archivos externos, configuralos en `build.extraResources` en `package.json`.
+- Mantené esos recursos fuera del repositorio si son generados o sensibles y copiá las versiones necesarias antes de `npm run dist` o `npm run pack`.
 
 ## 🧰 Troubleshooting
 
@@ -261,7 +263,7 @@ npm run postinstall
 
 ## 📄 Licencia
 
-Este proyecto es privado. Ver `LICENSE` para más información.
+Repositorio público pensado como plantilla. Definí y agregá tu `LICENSE` antes de distribuir una app basada en esto.
 
 ---
 
@@ -269,8 +271,7 @@ Este proyecto es privado. Ver `LICENSE` para más información.
 
 ¿Tenés dudas o problemas?
 
-- 🐛 Reportá bugs en [Issues](https://github.com/tu-usuario/athenea/issues)
-- 💬 Discusiones en [Discussions](https://github.com/tu-usuario/athenea/discussions)
-- 📧 Email: soporte@tuapp.com
+- 🐛 Reportá bugs en [Issues](https://github.com/NachoBasilio/Athenea-Desktop/issues)
+- 💬 Discusiones en [Discussions](https://github.com/NachoBasilio/Athenea-Desktop/discussions)
 
 ---
