@@ -4,14 +4,23 @@
 	"version": "0.1.0",
 	"type": "module",
 	"main": "electron.js",
+	"engines": {
+		"node": ">=22.0.0"
+	},
 	"scripts": {
+		"prepare": "husky",
 		"dev": "vite --port 5171 --strictPort",
-		"electron": "electron . --no-sandbox",
-		"dev:electron": "concurrently -k \"vite --port 5171 --strictPort\" \"wait-on http://localhost:5171 && electron . --no-sandbox\"",
-		"build": "vite build && cp preload.js dist/",
+		"electron": "cross-env NODE_OPTIONS='--experimental-require-module --no-warnings' electron .",
+		"electron:wait": "wait-on http://localhost:5171 && npm run electron",
+		"dev:electron": "concurrently -k \"vite --port 5171 --strictPort\" \"wait-on http://localhost:5171 && cross-env NODE_OPTIONS='--experimental-require-module --no-warnings' electron .\"",
+		"dev:electron:win": "concurrently -k \"npm run dev\" \"npm run electron:wait\"",
+		"copy-preload": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist')) fs.mkdirSync('dist'); fs.copyFileSync('preload.cjs','dist/preload.cjs')\"",
+		"build": "vite build && npm run copy-preload",
 		"preview": "vite preview",
-		"pack": "electron-builder --dir",
+		"pack": "npm run build && electron-builder --dir",
 		"dist": "npm run build && electron-builder",
+		"dist:linux": "npm run build && electron-builder --linux",
+		"dist:win": "npm run build && electron-builder --win",
 		"lint": "eslint .",
 		"format": "prettier --write .",
 		"typecheck": "tsc --noEmit",
@@ -19,87 +28,111 @@
 		"postinstall": "electron-builder install-app-deps"
 	},
 	"dependencies": {
+		"@preact/signals": "^2.5.1",
+		"@tanstack/react-table": "^8.21.3",
 		"axios": "^1.7.7",
 		"dayjs": "^1.11.13",
+		"electron-log": "^5.4.3",
+		"electron-updater": "^6.6.2",
 		"jwt-decode": "^4.0.0",
 		"keytar": "7.9.0",
 		"ky": "^1.2.4",
+		"pdf-to-printer": "5.6.1",
 		"preact": "^10.26.2",
 		"preact-iso": "^2.9.1",
+		"sweetalert2": "^11.26.10",
 		"zod": "^3.23.8",
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
+		"@commitlint/cli": "^20.1.0",
+		"@commitlint/config-conventional": "^20.0.0",
+		"@eslint/eslintrc": "^3.3.1",
+		"@eslint/js": "^9.39.1",
 		"@preact/preset-vite": "^2.10.1",
 		"@testing-library/preact": "3.2.3",
 		"@types/node": "^22.7.8",
+		"@typescript-eslint/eslint-plugin": "^8.46.4",
+		"@typescript-eslint/parser": "^8.46.4",
 		"autoprefixer": "^10.4.20",
 		"concurrently": "^8.2.0",
 		"cross-env": "^7.0.3",
 		"dotenv": "^16.4.5",
 		"electron": "^35.1.4",
 		"electron-builder": "^24.13.1",
-		"electron-log": "^5.4.3",
-		"electron-updater": "^6.6.2",
-		"eslint": "^9.10.0",
-		"eslint-config-preact": "^2.0.0",
-		"eslint-config-prettier": "^9.1.0",
-		"pdf-to-printer": "5.6.1",
+		"eslint": "^9.39.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.4",
+		"eslint-plugin-react-hooks": "^7.0.1",
+		"husky": "^9.1.7",
 		"postcss": "^8.4.47",
-		"prettier": "^3.3.3",
+		"prettier": "^3.6.2",
 		"tailwindcss": "^3.4.14",
-		"typescript": "^5.6.3",
-		"vite": "^6.2.0",
+		"typescript": "^5.9.3",
+		"vite": "^7.2.2",
 		"vite-tsconfig-paths": "^5.0.0",
 		"vitest": "^4.0.8",
 		"wait-on": "^7.0.1"
 	},
+	"overrides": {
+		"tar": "7.5.7"
+	},
 	"build": {
 		"appId": "com.pricut.dashboard",
-		"productName": "Pricut Dashboard",
+		"productName": "Proyecto Facturacion",
 		"asar": true,
 		"asarUnpack": [
-			"**/*.node"
+			"**/*.node",
+			"preload.cjs",
+			"node_modules/pdf-to-printer/**/*"
 		],
-		"files": [
-			"dist/**/*",
-			"electron.js",
-			"preload.js",
-			"package.json"
-		],
+		"directories": {
+			"buildResources": "assets",
+			"output": "../release"
+		},
 		"extraResources": [
 			{
-				"from": "dist/binaries",
-				"to": "binaries",
+				"from": "../backend/dist/api_billing_software",
+				"to": "api_billing_software",
 				"filter": [
 					"**/*"
 				]
 			}
 		],
-		"directories": {
-			"buildResources": "assets"
-		},
-		"extraMetadata": {
-			"main": "electron.js"
-		},
-		"publish": [
-			{
-				"provider": "generic",
-				"url": "https://updates.tuapp.com/"
-			}
+		"files": [
+			"dist/**/*",
+			"electron.js",
+			"preload.cjs",
+			"!**/*.map",
+			"!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+			"!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
 		],
 		"win": {
 			"target": [
 				"nsis"
 			],
-			"signAndEditExecutable": false
+			"signAndEditExecutable": false,
+			"icon": "assets/build.ico"
 		},
 		"nsis": {
 			"oneClick": false,
 			"perMachine": true,
 			"allowToChangeInstallationDirectory": true,
 			"createDesktopShortcut": true,
-			"createStartMenuShortcut": true
+			"createStartMenuShortcut": true,
+			"installerIcon": "assets/build.ico",
+			"uninstallerIcon": "assets/build.ico",
+			"installerSidebar": "installer-sidebar.bmp",
+			"uninstallerSidebar": "installer-sidebar.bmp",
+			"installerHeader": "installer-header.bmp"
+		},
+		"linux": {
+			"target": [
+				"AppImage",
+				"deb"
+			],
+			"category": "Office",
+			"maintainer": "tu-email@ejemplo.com"
 		}
 	}
 }

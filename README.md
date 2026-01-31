@@ -1,6 +1,6 @@
 # 👥 Athenea - Dashboard Desktop App
 
-Aplicación de escritorio profesional construida con tecnologías web modernas para un desarrollo ágil y mantenible.
+Aplicación de escritorio con Electron + Preact, empaquetada con electron-builder e integrada con backend local (binario incluido en `build/extraResources`).
 
 ## 🛠️ Stack Tecnológico
 
@@ -10,6 +10,7 @@ Aplicación de escritorio profesional construida con tecnologías web modernas p
 - ⚡ **[Vite](https://vitejs.dev/)** - Build tool ultrarrápido con HMR instantáneo
 - 🖥️ **[Electron](https://www.electronjs.org/)** - Framework para apps de escritorio multiplataforma
 - 📦 **[electron-builder](https://www.electron.build/)** - Empaquetado y distribución
+ - 🧰 **Backend incluido** - Binario `api_billing_software` se copia al build final
 
 ### Gestión de Estado y Datos
 
@@ -18,13 +19,16 @@ Aplicación de escritorio profesional construida con tecnologías web modernas p
 - 🔐 **[Keytar](https://github.com/atom/node-keytar)** - Almacenamiento seguro de credenciales
 - 🎯 **[Zod](https://zod.dev/)** - Validación de schemas TypeScript-first
 - 🔑 **[jwt-decode](https://github.com/auth0/jwt-decode)** - Decodificación de tokens JWT
+- ⚡ **[@preact/signals](https://preactjs.com/guide/v10/signals/)** - Estado reactivo
+- 📊 **[@tanstack/react-table](https://tanstack.com/table)** - Tablas flexibles
+- 🍬 **[SweetAlert2](https://sweetalert2.github.io/)** - Alertas modales
 
 ### Utilidades
 
 - 📅 **[Day.js](https://day.js.org/)** - Manipulación de fechas (2KB)
 - 🖨️ **[pdf-to-printer](https://github.com/artiebits/pdf-to-printer)** - Impresión de PDFs
 - 📝 **[electron-log](https://github.com/megahertz/electron-log)** - Sistema de logging
-- 🔄 **[electron-updater](https://www.electron.build/auto-update)** - Auto-actualizaciones
+- 🔄 **[electron-updater](https://www.electron.build/auto-update)** - Auto-actualizaciones (configurable)
 
 ### Desarrollo
 
@@ -44,8 +48,11 @@ Aplicación de escritorio profesional construida con tecnologías web modernas p
 # Ejecutar solo frontend en navegador (modo web)
 npm run dev
 
-# Ejecutar app completa de escritorio con hot-reload
+# Ejecutar app completa de escritorio con hot-reload (Electron + Vite)
 npm run dev:electron
+
+# Variante Windows (usa electron:wait)
+npm run dev:electron:win
 
 # Ejecutar solo Electron (requiere build previo)
 npm run electron
@@ -54,14 +61,18 @@ npm run electron
 ### Build y Distribución
 
 ```bash
-# Compilar frontend para producción
+# Compilar frontend y copiar preload.cjs
 npm run build
 
 # Vista previa del build
 npm run preview
 
-# Generar instalador completo (Windows/Linux/Mac)
+# Generar instalador completo (Windows/Linux)
 npm run dist
+
+# Targets específicos
+npm run dist:win
+npm run dist:linux
 
 # Generar solo carpeta empaquetada (sin instalador)
 npm run pack
@@ -89,7 +100,7 @@ npm run test
 
 ### Requisitos Previos
 
-- **Node.js** v18.0.0 o superior
+- **Node.js** v22.0.0 o superior (requerido)
 - **npm** v8.0.0 o superior
 - **Git** (recomendado)
 
@@ -165,17 +176,18 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 ## 🏗️ Estructura del Proyecto
 
 ```
-athenea/
+ athenea/
 ├── src/                  # Código fuente del frontend
 │   ├── components/       # Componentes Preact
-│   ├── stores/          # Stores de Zustand
-│   ├── utils/           # Utilidades y helpers
-│   └── main.tsx         # Entry point
-├── electron.js          # Proceso principal de Electron
-├── preload.js           # Script de preload (bridge seguro)
-├── dist/                # Build de producción
-├── assets/              # Recursos para el instalador
-└── package.json         # Dependencias y scripts
+│   ├── stores/           # Stores de Zustand
+│   ├── utils/            # Utilidades y helpers
+│   └── main.jsx          # Entry point
+├── electron.js           # Proceso principal de Electron (maneja backend y ventanas hijas)
+├── preload.cjs           # Script de preload (bridge seguro expuesto como electronAPI)
+├── backend/dist/api_billing_software/  # Binario local empaquetado (dev)
+├── assets/               # Recursos para el instalador (iconos, sidebars)
+├── dist/                 # Build de producción (frontend + preload copiado)
+└── package.json          # Dependencias y scripts
 ```
 
 ---
@@ -184,25 +196,16 @@ athenea/
 
 - **Credenciales:** Almacenadas de forma segura con `keytar` usando el keychain del sistema operativo
 - **Context isolation:** Habilitado para proteger el proceso renderer
-- **Preload script:** Expone solo APIs necesarias de forma controlada
+- **Preload script:** Expone solo APIs necesarias de forma controlada (window.electronAPI)
 - **Code signing:** Configurado para Windows (ajustar según necesidad)
 
 ---
 
 ## 🚢 Distribución y Updates
 
-La app está configurada para auto-actualizaciones usando `electron-updater`:
-
-```json
-"publish": [
-  {
-    "provider": "generic",
-    "url": "https://updates.tuapp.com/"
-  }
-]
-```
-
-Para usar updates automáticos, configurá tu servidor de updates y actualizá la URL.
+- El build coloca los binarios en `../release`.
+- El backend `api_billing_software` se incluye automáticamente desde `backend/dist` en `extraResources`.
+- `electron-updater` está disponible; configurá `publish` en `package.json` si vas a usar updates.
 
 ---
 
