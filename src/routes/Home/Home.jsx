@@ -1,13 +1,13 @@
-import { Counter } from '../../components/Counter/Counter'
+import { Counter } from "../../components/Counter/Counter";
 
-import './style.css'
+import "./style.css";
 
 export default function Home() {
-	return (
-		<div className="home">
-			<h1 className="home-title">¡Bienvendio a Athenea!</h1>
-			<img className="home-logo" src="../../public/logo.png" alt="" />
-			<Counter />
-		</div>
-	)
+  return (
+    <div className="home">
+      <h1 className="home-title">¡Bienvenido!</h1>
+      <img className="home-logo" src="../../public/logo.png" alt="" />
+      <Counter />
+    </div>
+  );
 }

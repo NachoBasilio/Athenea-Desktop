@@ -209,6 +209,36 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 
 ---
 
+## 🎨 Branding (nombre e imágenes)
+
+Este repo está pensado como plantilla. Por defecto dejamos todo en **genérico** para que puedas “re-brandear” sin buscar strings sueltos.
+
+### Nombre de la app (producción)
+
+- Instalador / app empaquetada: `package.json` → `build.productName`
+- Identificador (AppUserModelId / bundle id): `package.json` → `build.appId`
+
+### Títulos visibles (runtime)
+
+- Ventanas de Electron: `electron.js` → `BrowserWindow({ title: ... })`
+- HTML (cuando corre como web/renderer): `index.html` → `<title>`
+
+### Recursos del instalador (electron-builder / NSIS)
+
+Estos archivos se incluyen como placeholders **blancos** para que el build no falle si todavía no tenés diseño:
+
+- Ícono: `assets/build.ico`
+- Sidebar instalador: `assets/installer-sidebar.bmp`
+- Header instalador: `assets/installer-header.bmp`
+
+Reemplazalos por tus assets finales manteniendo los mismos nombres/rutas.
+
+### Favicon del renderer (Vite)
+
+- `index.html` referencia `vite.svg` → `public/vite.svg`
+
+---
+
 ## 📦 Recursos empaquetados
 
 - Por defecto no se incluye ningún recurso extra.

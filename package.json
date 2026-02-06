@@ -10,7 +10,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "vite --host --port 0",
-    "electron": "cross-env NODE_OPTIONS='--experimental-require-module --no-warnings' electron .",
+    "electron": "cross-env NODE_OPTIONS=\"--experimental-require-module --no-warnings\" electron .",
     "dev:electron": "node scripts/dev-electron.mjs",
     "dev:electron:win": "node scripts/dev-electron.mjs",
     "copy-preload": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist')) fs.mkdirSync('dist'); fs.copyFileSync('preload.cjs','dist/preload.cjs')\"",
@@ -76,8 +76,8 @@
     "tar": "7.5.7"
   },
   "build": {
-    "appId": "com.pricut.dashboard",
-    "productName": "Proyecto Facturacion",
+    "appId": "com.example.app",
+    "productName": "App",
     "asar": true,
     "asarUnpack": [
       "**/*.node",
@@ -112,9 +112,9 @@
       "createStartMenuShortcut": true,
       "installerIcon": "assets/build.ico",
       "uninstallerIcon": "assets/build.ico",
-      "installerSidebar": "installer-sidebar.bmp",
-      "uninstallerSidebar": "installer-sidebar.bmp",
-      "installerHeader": "installer-header.bmp"
+      "installerSidebar": "assets/installer-sidebar.bmp",
+      "uninstallerSidebar": "assets/installer-sidebar.bmp",
+      "installerHeader": "assets/installer-header.bmp"
     },
     "linux": {
       "target": [
