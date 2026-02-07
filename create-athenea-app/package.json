@@ -1,6 +1,6 @@
 {
   "name": "create-athenea-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "CLI para scaffoldear apps de escritorio con Electron + Preact + Vite (DX rapida: dev server, hot reload, build y empaquetado)",
   "keywords": [
