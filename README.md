@@ -1,6 +1,6 @@
 # 👥 Athenea - Dashboard Desktop App
 
-Plantilla pública lista para usar como base de app de escritorio con Electron + Preact, empaquetada con electron-builder.
+Plantilla pública lista para usar como base de app de escritorio con **Electron + Preact + Vite**, usando [electron-vite](https://electron-vite.org/) para un flujo de desarrollo integrado.
 
 ## 🛠️ Stack Tecnológico
 
@@ -9,6 +9,7 @@ Plantilla pública lista para usar como base de app de escritorio con Electron +
 - 🧬 **[Preact](https://preactjs.com/)** - Alternativa ligera y rápida a React (3KB)
 - ⚡ **[Vite](https://vitejs.dev/)** - Build tool ultrarrápido con HMR instantáneo
 - 🖥️ **[Electron](https://www.electronjs.org/)** - Framework para apps de escritorio multiplataforma
+- 🔧 **[electron-vite](https://electron-vite.org/)** - Integración Vite + Electron (HMR, build unificado)
 - 📦 **[electron-builder](https://www.electron.build/)** - Empaquetado y distribución
 
 ### Gestión de Estado y Datos
@@ -44,25 +45,17 @@ Plantilla pública lista para usar como base de app de escritorio con Electron +
 ### Desarrollo
 
 ```bash
-# Ejecutar solo frontend en navegador (modo web, puerto aleatorio)
+# Desarrollo completo (Electron + Vite con HMR)
 npm run dev
 
-# Ejecutar app completa de escritorio con hot-reload (Electron + Vite, puerto aleatorio)
-npm run dev:electron
-
-# Variante Windows (mismo script)
-npm run dev:electron:win
-
-# Nota Linux: el script arranca Electron con --no-sandbox para evitar el error de chrome-sandbox
-
-# Ejecutar solo Electron (requiere build previo)
-npm run electron
+# En Linux, si tenés problemas de sandbox:
+npm run dev:linux
 ```
 
 ### Build y Distribución
 
 ```bash
-# Compilar frontend y copiar preload.cjs
+# Compilar todo (main + preload + renderer)
 npm run build
 
 # Vista previa del build
@@ -128,23 +121,16 @@ cp .env.example .env
 Para desarrollo con hot-reload en Electron:
 
 ```bash
-npm run dev:electron
+npm run dev
 ```
 
 Esto iniciará:
 
-- Vite dev server en `http://localhost:5171`
-- Ventana de Electron automáticamente
+- Build de main y preload
+- Vite dev server para el renderer
+- Electron con HMR automático
 
-### Modo Desarrollo Web
-
-Para desarrollo solo en navegador:
-
-```bash
-npm run dev
-```
-
-Luego abrí `http://localhost:5171` en tu navegador.
+> **Nota Linux:** Si tenés errores de sandbox, usá `npm run dev:linux` que agrega `--no-sandbox`.
 
 ---
 
@@ -153,11 +139,11 @@ Luego abrí `http://localhost:5171` en tu navegador.
 ### 1. Compilar y Probar
 
 ```bash
-# Compilar frontend
+# Compilar todo
 npm run build
 
-# Probar en Electron
-npm run electron
+# Preview
+npm run preview
 ```
 
 ### 2. Generar Instalador
@@ -166,28 +152,34 @@ npm run electron
 npm run dist
 ```
 
-Esto generará instaladores en la carpeta `dist/` según tu plataforma:
+Esto generará instaladores en la carpeta `release/` según tu plataforma:
 
 - **Windows:** `.exe` (NSIS installer)
-- **Linux:** `.AppImage`, `.deb`, `.rpm`
-- **macOS:** `.dmg`, `.pkg`
+- **Linux:** `.AppImage`, `.deb`
 
 ---
 
 ## 🏗️ Estructura del Proyecto
 
 ```
- athenea/
-├── src/                  # Código fuente del frontend
-│   ├── components/       # Componentes Preact
-│   ├── stores/           # Stores de Zustand
-│   ├── utils/            # Utilidades y helpers
-│   └── main.jsx          # Entry point
-├── electron.js           # Proceso principal de Electron (maneja ventanas hijas)
-├── preload.cjs           # Script de preload (bridge seguro expuesto como electronAPI)
-├── assets/               # Recursos para el instalador (iconos, sidebars)
-├── dist/                 # Build de producción (frontend + preload copiado)
-└── package.json          # Dependencias y scripts
+athenea/
+├── src/
+│   ├── main/             # Proceso principal de Electron
+│   │   └── index.js      # Entry point, manejo de ventanas, IPC
+│   ├── preload/          # Scripts de preload
+│   │   └── index.js      # Bridge seguro (window.electronAPI)
+│   └── renderer/         # UI (Preact)
+│       ├── index.html    # HTML principal
+│       ├── public/       # Assets estáticos
+│       └── src/          # Código fuente del renderer
+│           ├── components/
+│           ├── routes/
+│           └── main.jsx
+├── resources/            # Assets para electron-builder (iconos, BMP)
+├── out/                  # Output del build (generado)
+├── release/              # Instaladores generados
+├── electron.vite.config.js
+└── package.json
 ```
 
 ---
@@ -198,20 +190,19 @@ Esto generará instaladores en la carpeta `dist/` según tu plataforma:
 - **Context isolation:** Habilitado para proteger el proceso renderer
 - **Preload script:** Expone solo APIs necesarias de forma controlada (window.electronAPI)
 - **Code signing:** Configurado para Windows (ajustar según necesidad)
-- **Sandbox en dev:** Se deshabilita en desarrollo para evitar problemas de permisos (chrome-sandbox). En producción se mantiene por defecto.
 
 ---
 
 ## 🚢 Distribución y Updates
 
-- El build coloca los artefactos en `../release`.
+- El build coloca los artefactos en `release/`.
 - `electron-updater` está disponible; configurá `publish` en `package.json` si vas a usar updates.
 
 ---
 
 ## 🎨 Branding (nombre e imágenes)
 
-Este repo está pensado como plantilla. Por defecto dejamos todo en **genérico** para que puedas “re-brandear” sin buscar strings sueltos.
+Este repo está pensado como plantilla. Por defecto dejamos todo en **genérico** para que puedas "re-brandear" sin buscar strings sueltos.
 
 ### Nombre de la app (producción)
 
@@ -220,22 +211,22 @@ Este repo está pensado como plantilla. Por defecto dejamos todo en **genérico*
 
 ### Títulos visibles (runtime)
 
-- Ventanas de Electron: `electron.js` → `BrowserWindow({ title: ... })`
-- HTML (cuando corre como web/renderer): `index.html` → `<title>`
+- Ventanas de Electron: `src/main/index.js` → `BrowserWindow({ title: ... })`
+- HTML (cuando corre como web/renderer): `src/renderer/index.html` → `<title>`
 
 ### Recursos del instalador (electron-builder / NSIS)
 
 Estos archivos se incluyen como placeholders **blancos** para que el build no falle si todavía no tenés diseño:
 
-- Ícono: `assets/build.ico`
-- Sidebar instalador: `assets/installer-sidebar.bmp`
-- Header instalador: `assets/installer-header.bmp`
+- Ícono: `resources/build.ico`
+- Sidebar instalador: `resources/installer-sidebar.bmp`
+- Header instalador: `resources/installer-header.bmp`
 
 Reemplazalos por tus assets finales manteniendo los mismos nombres/rutas.
 
 ### Favicon del renderer (Vite)
 
-- `index.html` referencia `vite.svg` → `public/vite.svg`
+- `src/renderer/index.html` referencia `./public/vite.svg`
 
 ---
 
@@ -263,15 +254,18 @@ npm install
 npm run postinstall
 ```
 
-### Error en dev:electron
+### Error en Linux (sandbox)
 
-- Asegurate que el puerto 5171 esté disponible
-- Verificá que no haya otra instancia de Electron corriendo
+```bash
+# Usar el script con --no-sandbox
+npm run dev:linux
+```
 
 ---
 
 ## 📚 Recursos Útiles
 
+- [Documentación de electron-vite](https://electron-vite.org/)
 - [Documentación de Preact](https://preactjs.com/guide/v10/getting-started)
 - [Guía de Vite](https://vitejs.dev/guide/)
 - [Electron API Docs](https://www.electronjs.org/docs/latest)

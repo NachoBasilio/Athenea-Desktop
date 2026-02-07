@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog, screen } from "electron";
-import path from "path";
-import { fileURLToPath } from "url";
+import path, { join } from "path";
 import fs from "fs";
 import os from "os";
 import keytar from "keytar";
@@ -14,8 +13,6 @@ log.transports.file.level = "info";
 log.info("🚀 Iniciando aplicación...");
 
 const { print: printPDF, getPrinters } = pdfPrinter;
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Deshabilitar features que causan warnings innecesarios
 app.commandLine.appendSwitch("disable-features", "Autofill");
@@ -45,9 +42,10 @@ function getBackendPath() {
   }
 
   // En desarrollo, asumimos que el backend está en la carpeta dist del backend
-  // Ajustar esta ruta según tu estructura local si es necesario
   return path.join(
     __dirname,
+    "..",
+    "..",
     "..",
     "backend",
     "dist",
@@ -72,8 +70,8 @@ function startBackend() {
   try {
     backendProcess = spawn(backendPath, [], {
       cwd: path.dirname(backendPath),
-      stdio: "pipe", // Para capturar logs
-      windowsHide: true, // Ocultar ventana de consola en Windows
+      stdio: "pipe",
+      windowsHide: true,
     });
 
     log.info(`[BACKEND] Proceso spawneado con PID: ${backendProcess.pid}`);
@@ -113,24 +111,13 @@ function stopBackend() {
 /** @type {BrowserWindow | null} */
 let mainWindow = null;
 
-// Mapa para NO duplicar ventanas por ruta
 /** @type {Map<string, BrowserWindow>} */
 const childWindowsByRoute = new Map();
 
-// Ruta para guardar configuración simple en JSON
 const settingsPath = path.join(app.getPath("userData"), "settings.json");
 
 /** Crea ventana principal, carga renderer y sincroniza eventos hijo/padre. */
 function createWindow() {
-  const isDev = !app.isPackaged;
-  const devServerUrl = process.env.DEV_SERVER_URL || "http://localhost:5171";
-
-  // Debug logs
-  log.info("🔍 isDev:", isDev);
-  log.info("🔍 __dirname:", __dirname);
-  log.info("🔍 app.isPackaged:", app.isPackaged);
-
-  // Obtener el tamaño de la pantalla
   const { width: screenWidth, height: screenHeight } =
     screen.getPrimaryDisplay().workAreaSize;
 
@@ -139,8 +126,8 @@ function createWindow() {
     height: screenHeight,
     title: "App",
     webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"),
-      devTools: isDev,
+      preload: join(__dirname, "../preload/index.mjs"),
+      sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -148,22 +135,15 @@ function createWindow() {
 
   mainWindow.setMenuBarVisibility(false);
   mainWindow.setAutoHideMenuBar(true);
-
-  // Maximizar la ventana principal al iniciar
   mainWindow.maximize();
 
-  if (isDev) {
-    mainWindow.loadURL(devServerUrl);
+  // electron-vite: usa ELECTRON_RENDERER_URL en dev
+  if (process.env.ELECTRON_RENDERER_URL) {
+    mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    const indexPath = path.join(__dirname, "dist", "index.html");
-    log.info("🔍 Loading index from:", indexPath);
-    log.info("🔍 File exists:", fs.existsSync(indexPath));
-
-    mainWindow.loadFile(indexPath, {
-      query: {
-        route: "/",
-      },
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"), {
+      query: { route: "/" },
     });
   }
 
@@ -175,7 +155,6 @@ function createWindow() {
     }
   });
 
-  // Debug: detectar errores de carga
   mainWindow.webContents.on(
     "did-fail-load",
     (event, errorCode, errorDescription) => {
@@ -187,7 +166,6 @@ function createWindow() {
     log.info("✅ Main window loaded successfully");
   });
 
-  // Notificar al renderer cuando la ventana se maximiza / restaura
   mainWindow.on("maximize", () => {
     mainWindow?.webContents.send("window:maximized");
   });
@@ -196,7 +174,6 @@ function createWindow() {
     mainWindow?.webContents.send("window:unmaximized");
   });
 
-  // 👉 Cuando se minimiza la principal, minimizamos las hijas
   mainWindow.on("minimize", () => {
     for (const [, child] of childWindowsByRoute) {
       if (!child.isDestroyed() && !child.isMinimized()) {
@@ -205,7 +182,6 @@ function createWindow() {
     }
   });
 
-  // 👉 Cuando se restaura la principal, restauramos las hijas
   mainWindow.on("restore", () => {
     for (const [, child] of childWindowsByRoute) {
       if (!child.isDestroyed()) {
@@ -236,7 +212,6 @@ app.on("activate", () => {
 
 // ------------------- HELPERS SETTINGS -------------------
 
-/** Lee settings JSON desde userData. */
 function readSettings() {
   try {
     if (!fs.existsSync(settingsPath)) return {};
@@ -248,7 +223,6 @@ function readSettings() {
   }
 }
 
-/** Persiste settings JSON en userData. */
 function writeSettings(data) {
   try {
     fs.writeFileSync(settingsPath, JSON.stringify(data, null, 2), "utf-8");
@@ -261,7 +235,6 @@ function writeSettings(data) {
 
 // ------------------- IPC: APP / WINDOW -------------------
 
-/** IPC de app: version/env/quit/relaunch. */
 ipcMain.handle("app:getVersion", () => app.getVersion());
 ipcMain.handle(
   "app:getEnv",
@@ -273,7 +246,6 @@ ipcMain.on("app:relaunch", () => {
   app.exit(0);
 });
 
-/** IPC ventana: minimizar sincronizando hijas si aplica. */
 ipcMain.on("window:minimize", (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (!win) return;
@@ -289,7 +261,6 @@ ipcMain.on("window:minimize", (event) => {
   }
 });
 
-/** Alterna maximizar/restaurar según estado actual. */
 ipcMain.on("window:maximize", (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (!win) return;
@@ -319,7 +290,6 @@ ipcMain.handle("window:isMaximized", (event) => {
   return win?.isMaximized() ?? false;
 });
 
-/** Ajusta tamaño de ventana desde renderer; usa sender para elegir la ventana. */
 ipcMain.on("window:setSize", (event, payload = {}) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (!win) return;
@@ -341,7 +311,6 @@ ipcMain.on("window:setSize", (event, payload = {}) => {
   const finalHeight = Math.max(150, requestedHeight);
 
   try {
-    // Si está maximizada, el setSize no se nota (queda maximizada)
     if (win.isMaximized()) win.unmaximize();
 
     win.setSize(finalWidth, finalHeight);
@@ -363,7 +332,6 @@ ipcMain.on("window:setSize", (event, payload = {}) => {
 
 // ------------------- IPC: DIALOGOS -------------------
 
-/** IPC diálogos: abrir archivo. */
 ipcMain.handle("dialog:openFile", async (_event, options) => {
   const result = await dialog.showOpenDialog(mainWindow ?? undefined, {
     properties: ["openFile"],
@@ -372,7 +340,6 @@ ipcMain.handle("dialog:openFile", async (_event, options) => {
   return result;
 });
 
-/** IPC diálogos: abrir carpeta. */
 ipcMain.handle("dialog:openFolder", async (_event, options) => {
   const result = await dialog.showOpenDialog(mainWindow ?? undefined, {
     properties: ["openDirectory"],
@@ -381,7 +348,6 @@ ipcMain.handle("dialog:openFolder", async (_event, options) => {
   return result;
 });
 
-/** IPC diálogos: guardar archivo. */
 ipcMain.handle("dialog:saveFile", async (_event, options) => {
   const result = await dialog.showSaveDialog(mainWindow ?? undefined, {
     ...options,
@@ -481,13 +447,6 @@ ipcMain.on("window:openRoute", (_event, options) => {
     return;
   }
 
-  console.log("🔍 IPC window:openRoute llamado con:", {
-    route,
-    title,
-    requestedWidth,
-    requestedHeight,
-  });
-
   const routeKey = String(route);
 
   const existing = childWindowsByRoute.get(routeKey);
@@ -499,8 +458,6 @@ ipcMain.on("window:openRoute", (_event, options) => {
   } else if (existing) {
     childWindowsByRoute.delete(routeKey);
   }
-
-  const isDev = !app.isPackaged;
 
   const winWidth = requestedWidth || 1200;
   const winHeight = requestedHeight || 700;
@@ -517,10 +474,6 @@ ipcMain.on("window:openRoute", (_event, options) => {
     y = dy + Math.round((dh - winHeight) / 2);
   }
 
-  const preloadPath = path.join(__dirname, "preload.cjs");
-  log.info("🔍 Preload path:", preloadPath);
-  log.info("🔍 Preload exists:", fs.existsSync(preloadPath));
-
   const child = new BrowserWindow({
     width: winWidth,
     height: winHeight,
@@ -532,8 +485,8 @@ ipcMain.on("window:openRoute", (_event, options) => {
     maximizable: true,
     modal: false,
     webPreferences: {
-      preload: preloadPath,
-      devTools: isDev,
+      preload: join(__dirname, "../preload/index.mjs"),
+      sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -542,7 +495,6 @@ ipcMain.on("window:openRoute", (_event, options) => {
   child.setMenuBarVisibility(false);
   child.setAutoHideMenuBar(true);
 
-  // Establecer relación padre-hijo para que siempre esté arriba de la madre
   if (mainWindow && !mainWindow.isDestroyed()) {
     child.setParentWindow(mainWindow);
   }
@@ -557,21 +509,14 @@ ipcMain.on("window:openRoute", (_event, options) => {
 
   childWindowsByRoute.set(routeKey, child);
 
-  if (isDev) {
-    const devUrl = `${devServerUrl}?route=${encodeURIComponent(route)}&child=1`;
+  if (process.env.ELECTRON_RENDERER_URL) {
+    const devUrl = `${process.env.ELECTRON_RENDERER_URL}?route=${encodeURIComponent(route)}&child=1`;
     log.info("🔍 Loading child window (dev):", devUrl);
     child.loadURL(devUrl);
     child.webContents.openDevTools();
   } else {
-    const indexPath = path.join(__dirname, "dist", "index.html");
-    log.info("🔍 Loading child window (prod):", indexPath);
-    log.info("🔍 With route:", route);
-
-    child.loadFile(indexPath, {
-      query: {
-        route: route,
-        child: "1",
-      },
+    child.loadFile(join(__dirname, "../renderer/index.html"), {
+      query: { route, child: "1" },
     });
   }
 
@@ -587,15 +532,10 @@ ipcMain.on("window:openRoute", (_event, options) => {
     "did-fail-load",
     (event, errorCode, errorDescription) => {
       log.error("❌ Child window failed to load:", errorCode, errorDescription);
-      log.error("   Route was:", route);
     },
   );
 
   child.webContents.on("did-finish-load", () => {
     log.info("✅ Child window loaded successfully for route:", route);
-  });
-
-  child.webContents.on("console-message", (event, level, message) => {
-    log.info(`[Child Window Console] ${message}`);
   });
 });

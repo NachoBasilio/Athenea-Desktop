@@ -1,0 +1,28 @@
+{
+  "name": "create-athenea-app",
+  "version": "0.1.2",
+  "type": "module",
+  "description": "CLI para scaffoldear apps de escritorio con Electron + Preact + Vite (DX rapida: dev server, hot reload, build y empaquetado)",
+  "keywords": [
+    "create",
+    "starter",
+    "template",
+    "electron",
+    "preact",
+    "vite"
+  ],
+  "bin": {
+    "create-athenea-app": "bin/index.js"
+  },
+  "files": [
+    "bin",
+    "template"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}

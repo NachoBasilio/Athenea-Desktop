@@ -1,21 +1,18 @@
 {
   "name": "athenea",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
-  "main": "electron.js",
+  "main": "./out/main/index.js",
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
     "prepare": "husky",
-    "dev": "vite --host --port 0",
-    "electron": "cross-env NODE_OPTIONS=\"--experimental-require-module --no-warnings\" electron .",
-    "dev:electron": "node scripts/dev-electron.mjs",
-    "dev:electron:win": "node scripts/dev-electron.mjs",
-    "copy-preload": "node -e \"const fs=require('fs'); if(!fs.existsSync('dist')) fs.mkdirSync('dist'); fs.copyFileSync('preload.cjs','dist/preload.cjs')\"",
-    "build": "vite build && npm run copy-preload",
-    "preview": "vite preview",
+    "dev": "electron-vite dev",
+    "dev:linux": "electron-vite dev -- --no-sandbox",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
     "dist:linux": "npm run build && electron-builder --linux",
@@ -53,11 +50,9 @@
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "autoprefixer": "^10.4.20",
-    "concurrently": "^8.2.0",
-    "cross-env": "^7.0.3",
-    "dotenv": "^16.4.5",
     "electron": "^35.1.4",
     "electron-builder": "^24.13.1",
+    "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
@@ -69,8 +64,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.2.2",
     "vite-tsconfig-paths": "^5.0.0",
-    "vitest": "^4.0.8",
-    "wait-on": "^7.0.1"
+    "vitest": "^4.0.8"
   },
   "overrides": {
     "tar": "7.5.7"
@@ -81,28 +75,27 @@
     "asar": true,
     "asarUnpack": [
       "**/*.node",
-      "preload.cjs",
       "node_modules/pdf-to-printer/**/*"
     ],
     "directories": {
-      "buildResources": "assets",
-      "output": "../release"
+      "buildResources": "resources",
+      "output": "release"
     },
     "extraResources": [],
     "files": [
-      "dist/**/*",
-      "electron.js",
-      "preload.cjs",
+      "out/**/*",
       "!**/*.map",
       "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
-      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!src/**/*",
+      "!electron.vite.config.*"
     ],
     "win": {
       "target": [
         "nsis"
       ],
       "signAndEditExecutable": false,
-      "icon": "assets/build.ico"
+      "icon": "resources/build.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -110,11 +103,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "installerIcon": "assets/build.ico",
-      "uninstallerIcon": "assets/build.ico",
-      "installerSidebar": "assets/installer-sidebar.bmp",
-      "uninstallerSidebar": "assets/installer-sidebar.bmp",
-      "installerHeader": "assets/installer-header.bmp"
+      "installerIcon": "resources/build.ico",
+      "uninstallerIcon": "resources/build.ico",
+      "installerSidebar": "resources/installer-sidebar.bmp",
+      "uninstallerSidebar": "resources/installer-sidebar.bmp",
+      "installerHeader": "resources/installer-header.bmp"
     },
     "linux": {
       "target": [

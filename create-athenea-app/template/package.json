@@ -1,0 +1,74 @@
+{
+  "name": "my-athenea-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Aplicación de escritorio creada con Athenea",
+  "author": "Developer",
+  "type": "module",
+  "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "dev:linux": "electron-vite dev -- --no-sandbox",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "dist:win": "npm run build && electron-builder --win"
+  },
+  "dependencies": {
+    "preact": "^10.26.2",
+    "preact-iso": "^2.9.1"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.1",
+    "electron": "^35.1.4",
+    "electron-builder": "^24.13.1",
+    "electron-vite": "^5.0.0",
+    "vite": "^7.2.2"
+  },
+  "build": {
+    "appId": "com.example.app",
+    "productName": "App",
+    "asar": true,
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "!**/*.map",
+      "!src/**/*",
+      "!electron.vite.config.*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "signAndEditExecutable": false,
+      "icon": "resources/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "resources/icon.ico",
+      "uninstallerIcon": "resources/icon.ico",
+      "installerSidebar": "resources/installer-sidebar.bmp",
+      "uninstallerSidebar": "resources/installer-sidebar.bmp",
+      "installerHeader": "resources/installer-header.bmp"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "resources/icon.png",
+      "category": "Office"
+    }
+  }
+}

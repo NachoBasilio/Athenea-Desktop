@@ -10,8 +10,12 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+out
+release
 *.local
 Release.md
+Athenea.zip
+*.tgz
 
 # Editor directories and files
 .vscode/*
