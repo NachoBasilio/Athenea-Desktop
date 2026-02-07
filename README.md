@@ -1,6 +1,23 @@
 # 👥 Athenea - Dashboard Desktop App
 
+[![npm version](https://img.shields.io/npm/v/create-athenea-app.svg)](https://www.npmjs.com/package/create-athenea-app)
+[![license](https://img.shields.io/npm/l/create-athenea-app.svg)](https://github.com/NachoBasilio/Athenea-Desktop/blob/main/LICENSE)
+
 Plantilla pública lista para usar como base de app de escritorio con **Electron + Preact + Vite**, usando [electron-vite](https://electron-vite.org/) para un flujo de desarrollo integrado.
+
+## ⚡ Inicio Rápido
+
+```bash
+npm create athenea-app@latest
+```
+
+O con nombre directo:
+
+```bash
+npm create athenea-app@latest mi-proyecto
+cd mi-proyecto
+npm run dev
+```
 
 ## 🛠️ Stack Tecnológico
 

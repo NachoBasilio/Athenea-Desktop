@@ -1,6 +1,6 @@
 {
   "name": "create-athenea-app",
-  "version": "0.1.2",
+  "version": "1.0.1",
   "type": "module",
   "description": "CLI para scaffoldear apps de escritorio con Electron + Preact + Vite (DX rapida: dev server, hot reload, build y empaquetado)",
   "keywords": [
@@ -8,9 +8,21 @@
     "starter",
     "template",
     "electron",
+    "electron-vite",
     "preact",
-    "vite"
+    "vite",
+    "desktop"
   ],
+  "homepage": "https://github.com/NachoBasilio/Athenea-Desktop#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NachoBasilio/Athenea-Desktop.git",
+    "directory": "create-athenea-app"
+  },
+  "bugs": {
+    "url": "https://github.com/NachoBasilio/Athenea-Desktop/issues"
+  },
+  "author": "NachoBasilio",
   "bin": {
     "create-athenea-app": "bin/index.js"
   },
