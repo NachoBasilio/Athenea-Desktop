@@ -1,6 +1,6 @@
 # **APP_TITLE**
 
-Aplicación de escritorio creada con [Athenea](https://github.com/tu-usuario/athenea-desktop).
+Aplicación de escritorio creada con [Athenea](https://github.com/ignadev/Athenea-Desktop).
 
 ## Stack
 

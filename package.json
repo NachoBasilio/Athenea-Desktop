@@ -2,6 +2,7 @@
   "name": "athenea",
   "private": true,
   "version": "0.1.1",
+  "author": "Ignacio Basilio (Ignadev)",
   "type": "module",
   "main": "./out/main/index.js",
   "engines": {
@@ -115,7 +116,7 @@
         "deb"
       ],
       "category": "Office",
-      "maintainer": "tu-email@ejemplo.com"
+      "maintainer": "Ignacio Basilio (Ignadev)"
     }
   }
 }
