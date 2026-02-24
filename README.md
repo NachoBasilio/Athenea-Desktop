@@ -1,9 +1,11 @@
 # 👥 Athenea - Dashboard Desktop App
 
 [![npm version](https://img.shields.io/npm/v/create-athenea-app.svg)](https://www.npmjs.com/package/create-athenea-app)
-[![license](https://img.shields.io/npm/l/create-athenea-app.svg)](https://github.com/NachoBasilio/Athenea-Desktop/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/create-athenea-app.svg)](https://github.com/ignadev/Athenea-Desktop/blob/main/LICENSE)
 
 Plantilla pública lista para usar como base de app de escritorio con **Electron + Preact + Vite**, usando [electron-vite](https://electron-vite.org/) para un flujo de desarrollo integrado.
+
+Creado por **Ignacio Basilio** (Ignadev).
 
 ## ⚡ Inicio Rápido
 
@@ -105,6 +107,30 @@ npm run typecheck
 npm run test
 ```
 
+### Estructura de AGENTS y skills (agregada)
+
+Se agregó una estructura por capas para documentar reglas operativas y criterios de calidad según contexto:
+
+- `AGENTS.md` en raíz con reglas globales y tabla de auto-invocación de skills.
+- `src/AGENTS.md` y AGENTS específicos en `src/main/`, `src/preload/` y `src/renderer/`.
+- `create-athenea-app/AGENTS.md` y `create-athenea-app/template/AGENTS.md` para la zona CLI/template.
+- Skills accionables en `skills/`:
+  - `skills/electron-ipc-contract/SKILL.md`
+  - `skills/renderer-preact-routes/SKILL.md`
+  - `skills/create-athenea-template-sync/SKILL.md`
+  - `skills/desktop-quality-gates/SKILL.md`
+
+La precedencia de reglas es por cercanía: el `AGENTS.md` más cercano al archivo que se toca es el que manda.
+
+### Versionado limpio (npm/build)
+
+También se reforzó el versionado para subir solo archivos necesarios de código y configuración:
+
+- Se ignoran artefactos generados de build/distribución (`out/`, `release/`, `dist/`, `dist-ssr/`).
+- Se ignoran dependencias/caches de npm y tooling (`node_modules/`, `.npm/`, `.pnpm-store/`, `.vite/`, `.cache/`, `.eslintcache`, `coverage/`, `*.tsbuildinfo`).
+
+Esto evita subir salidas generadas y mantiene el historial enfocado en cambios fuente.
+
 ---
 
 ## 💻 Instalación y Configuración
@@ -119,7 +145,7 @@ npm run test
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/NachoBasilio/Athenea-Desktop.git
+git clone https://github.com/ignadev/Athenea-Desktop.git
 cd Athenea-Desktop
 
 # 2. Instalar dependencias
@@ -313,8 +339,8 @@ Repositorio público pensado como plantilla. Definí y agregá tu `LICENSE` ante
 
 ¿Tenés dudas o problemas?
 
-- 🐛 Reportá bugs en [Issues](https://github.com/NachoBasilio/Athenea-Desktop/issues)
-- 💬 Discusiones en [Discussions](https://github.com/NachoBasilio/Athenea-Desktop/discussions)
+- 🐛 Reportá bugs en [Issues](https://github.com/ignadev/Athenea-Desktop/issues)
+- 💬 Discusiones en [Discussions](https://github.com/ignadev/Athenea-Desktop/discussions)
 - 📧 Email: ignacio.n.basilio.b@gmail.com
 
 ---

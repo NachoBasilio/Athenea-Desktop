@@ -7,11 +7,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-out
-release
+# npm and package manager caches
+.npm/
+.pnpm-store/
+
+# Build artifacts
+out/
+release/
+dist/
+dist-ssr/
+
+# Tooling caches
+.vite/
+.cache/
+.eslintcache
+coverage/
+*.tsbuildinfo
+
+node_modules/
 *.local
 Release.md
 Athenea.zip
