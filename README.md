@@ -107,29 +107,28 @@ npm run typecheck
 npm run test
 ```
 
-### Estructura de AGENTS y skills (agregada)
+## 🧭 Guía Operativa: AGENTS + Skills
 
-Se agregó una estructura por capas para documentar reglas operativas y criterios de calidad según contexto:
+Este repositorio usa una capa de reglas operativas para mantener cambios consistentes entre app desktop, renderer y CLI.
 
-- `AGENTS.md` en raíz con reglas globales y tabla de auto-invocación de skills.
-- `src/AGENTS.md` y AGENTS específicos en `src/main/`, `src/preload/` y `src/renderer/`.
-- `create-athenea-app/AGENTS.md` y `create-athenea-app/template/AGENTS.md` para la zona CLI/template.
-- Skills accionables en `skills/`:
-  - `skills/electron-ipc-contract/SKILL.md`
-  - `skills/renderer-preact-routes/SKILL.md`
-  - `skills/create-athenea-template-sync/SKILL.md`
-  - `skills/desktop-quality-gates/SKILL.md`
+### Cómo funciona AGENTS
 
-La precedencia de reglas es por cercanía: el `AGENTS.md` más cercano al archivo que se toca es el que manda.
+- `AGENTS.md` (raíz) define reglas globales del proyecto.
+- Cada zona relevante tiene su propio `AGENTS.md` (`src/`, `src/main/`, `src/preload/`, `src/renderer/`, `create-athenea-app/`, `create-athenea-app/template/`).
+- Regla de precedencia: siempre manda el `AGENTS.md` más cercano al archivo editado.
 
-### Versionado limpio (npm/build)
+### Skills disponibles y para qué sirve cada una
 
-También se reforzó el versionado para subir solo archivos necesarios de código y configuración:
+- `skills/electron-ipc-contract/SKILL.md`: asegura consistencia y seguridad del contrato IPC entre `src/main/` y `src/preload/`.
+- `skills/renderer-preact-routes/SKILL.md`: guía cambios en rutas/componentes del renderer Preact manteniendo estructura y patrones de UI.
+- `skills/create-athenea-template-sync/SKILL.md`: obliga sincronía entre `create-athenea-app/bin/` y `create-athenea-app/template/` para que el scaffolding no se rompa.
+- `skills/desktop-quality-gates/SKILL.md`: define gates mínimos de calidad antes de cerrar cambios (lint, typecheck/build y coherencia documental).
 
-- Se ignoran artefactos generados de build/distribución (`out/`, `release/`, `dist/`, `dist-ssr/`).
-- Se ignoran dependencias/caches de npm y tooling (`node_modules/`, `.npm/`, `.pnpm-store/`, `.vite/`, `.cache/`, `.eslintcache`, `coverage/`, `*.tsbuildinfo`).
+### Política de versionado limpio
 
-Esto evita subir salidas generadas y mantiene el historial enfocado en cambios fuente.
+- Se versiona solo código y configuración fuente.
+- Se ignoran salidas generadas de build/distribución (`out/`, `release/`, `dist/`, `dist-ssr/`).
+- Se ignoran dependencias/caches de tooling (`node_modules/`, `.npm/`, `.pnpm-store/`, `.vite/`, `.cache/`, `.eslintcache`, `coverage/`, `*.tsbuildinfo`).
 
 ---
 
@@ -206,18 +205,33 @@ Esto generará instaladores en la carpeta `release/` según tu plataforma:
 
 ```
 athenea/
+├── AGENTS.md              # Reglas globales del repo
+├── skills/                # Skills operativas por dominio
+│   ├── electron-ipc-contract/
+│   ├── renderer-preact-routes/
+│   ├── create-athenea-template-sync/
+│   └── desktop-quality-gates/
 ├── src/
+│   ├── AGENTS.md          # Reglas de app desktop
 │   ├── main/             # Proceso principal de Electron
+│   │   ├── AGENTS.md
 │   │   └── index.js      # Entry point, manejo de ventanas, IPC
 │   ├── preload/          # Scripts de preload
+│   │   ├── AGENTS.md
 │   │   └── index.js      # Bridge seguro (window.electronAPI)
 │   └── renderer/         # UI (Preact)
+│       ├── AGENTS.md
 │       ├── index.html    # HTML principal
 │       ├── public/       # Assets estáticos
 │       └── src/          # Código fuente del renderer
 │           ├── components/
 │           ├── routes/
 │           └── main.jsx
+├── create-athenea-app/    # CLI para scaffolding (publicado en npm)
+│   ├── AGENTS.md
+│   ├── bin/
+│   └── template/
+│       └── AGENTS.md
 ├── resources/            # Assets para electron-builder (iconos, BMP)
 ├── out/                  # Output del build (generado)
 ├── release/              # Instaladores generados
