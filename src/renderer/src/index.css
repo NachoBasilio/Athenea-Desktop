@@ -18,6 +18,6 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-#root {
+#app {
 	height: 100%;
 }
