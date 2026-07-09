@@ -77,6 +77,12 @@ function startBackend() {
     log.error(
       "   Si estás en desarrollo, asegúrate de haber compilado el backend.",
     );
+    if (app.isPackaged) {
+      dialog.showErrorBox(
+        "Backend not found",
+        `The backend executable could not be found at:\n${backendPath}\n\nThe application will continue to run, but backend-dependent features will not work.`,
+      );
+    }
     return;
   }
 
@@ -104,9 +110,21 @@ function startBackend() {
 
     backendProcess.on("error", (err) => {
       log.error("[BACKEND] Error al iniciar el proceso:", err);
+      if (app.isPackaged) {
+        dialog.showErrorBox(
+          "Backend failed to start",
+          `The backend process could not be started:\n${err?.message || String(err)}\n\nThe application will continue to run, but backend-dependent features will not work.`,
+        );
+      }
     });
   } catch (error) {
     log.error("[BACKEND] Excepción al intentar spawnear:", error);
+    if (app.isPackaged) {
+      dialog.showErrorBox(
+        "Backend failed to start",
+        `The backend process could not be started:\n${error?.message || String(error)}\n\nThe application will continue to run, but backend-dependent features will not work.`,
+      );
+    }
   }
 }
 
@@ -229,6 +247,10 @@ function createWindow() {
         child.restore();
       }
     }
+  });
+
+  mainWindow.on("closed", () => {
+    mainWindow = null;
   });
 }
 
@@ -373,24 +395,30 @@ ipcMain.on("window:setSize", (event, payload = {}) => {
 
 // ------------------- IPC: DIALOGOS -------------------
 
-ipcMain.handle("dialog:openFile", async (_event, options) => {
-  const result = await dialog.showOpenDialog(mainWindow ?? undefined, {
+ipcMain.handle("dialog:openFile", async (event, options) => {
+  const parent =
+    BrowserWindow.fromWebContents(event.sender) ?? mainWindow ?? undefined;
+  const result = await dialog.showOpenDialog(parent, {
     properties: ["openFile"],
     ...options,
   });
   return result;
 });
 
-ipcMain.handle("dialog:openFolder", async (_event, options) => {
-  const result = await dialog.showOpenDialog(mainWindow ?? undefined, {
+ipcMain.handle("dialog:openFolder", async (event, options) => {
+  const parent =
+    BrowserWindow.fromWebContents(event.sender) ?? mainWindow ?? undefined;
+  const result = await dialog.showOpenDialog(parent, {
     properties: ["openDirectory"],
     ...options,
   });
   return result;
 });
 
-ipcMain.handle("dialog:saveFile", async (_event, options) => {
-  const result = await dialog.showSaveDialog(mainWindow ?? undefined, {
+ipcMain.handle("dialog:saveFile", async (event, options) => {
+  const parent =
+    BrowserWindow.fromWebContents(event.sender) ?? mainWindow ?? undefined;
+  const result = await dialog.showSaveDialog(parent, {
     ...options,
   });
   return result;
@@ -416,10 +444,7 @@ ipcMain.handle("settings:reset", () => {
 
 const DEFAULT_SERVICE = "athenea";
 
-const secureStorePath = path.join(
-  app.getPath("userData"),
-  "secure-store.json",
-);
+const secureStorePath = path.join(app.getPath("userData"), "secure-store.json");
 
 function secureStoreKey(service, account) {
   return `${service}:${account}`;
@@ -502,12 +527,30 @@ ipcMain.handle(
 );
 
 // ------------------- IPC: IMPRESIÓN -------------------
+// pdf-to-printer only supports Windows; on other platforms we return a
+// consistent "not supported" shape instead of letting it throw.
+
+const isPrintingSupported = process.platform === "win32";
 
 ipcMain.handle("printer:getPrinters", async () => {
-  return await getPrinters();
+  if (!isPrintingSupported) {
+    log.warn("printer:getPrinters - Printing is only supported on Windows");
+    return [];
+  }
+
+  try {
+    return await getPrinters();
+  } catch (err) {
+    log.error("Error listando impresoras:", err);
+    return [];
+  }
 });
 
 ipcMain.handle("printer:printPDF", async (_event, { filePath, options }) => {
+  if (!isPrintingSupported) {
+    return { ok: false, error: "Printing is only supported on Windows" };
+  }
+
   try {
     await printPDF(filePath, options || {});
     return { ok: true };

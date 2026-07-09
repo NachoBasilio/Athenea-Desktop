@@ -1,7 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-console.log(">>> PRELOAD CARGADO (ESM)");
-
 /** Bridge seguro expuesto en window.electronAPI. */
 const api = {
   // ---- APP ----

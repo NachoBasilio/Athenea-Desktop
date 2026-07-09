@@ -9,6 +9,8 @@ export default [
 	{
 		files: [
 			'electron.vite.config.js',
+			'vitest.config.js',
+			'scripts/**/*.cjs',
 			'src/main/**/*.js',
 			'src/preload/**/*.js',
 			'create-athenea-app/bin/**/*.js',
@@ -99,6 +101,8 @@ export default [
 				fetch: 'readonly',
 				setInterval: 'readonly',
 				clearInterval: 'readonly',
+				location: 'readonly',
+				URLSearchParams: 'readonly',
 			},
 		},
 		plugins: {
