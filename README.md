@@ -35,7 +35,7 @@ npm run dev
 
 - 🐻 **[Zustand](https://zustand-demo.pmnd.rs/)** - State management minimalista (1KB)
 - 🌐 **[Ky](https://github.com/sindresorhus/ky)** - HTTP client ligero
-- 🔐 **[Keytar](https://github.com/atom/node-keytar)** - Almacenamiento seguro de credenciales
+- 🔐 **[safeStorage](https://www.electronjs.org/docs/latest/api/safe-storage)** (Electron) - Almacenamiento seguro de credenciales
 - 🎯 **[Zod](https://zod.dev/)** - Validación de schemas TypeScript-first
 - 🔑 **[jwt-decode](https://github.com/auth0/jwt-decode)** - Decodificación de tokens JWT
 - ⚡ **[@preact/signals](https://preactjs.com/guide/v10/signals/)** - Estado reactivo
@@ -52,7 +52,7 @@ npm run dev
 ### Desarrollo
 
 - 🎨 **[Tailwind CSS](https://tailwindcss.com/)** - Framework CSS utility-first
-- 📘 **[TypeScript](https://www.typescriptlang.org/)** - Tipado estático
+- 📘 **[TypeScript](https://www.typescriptlang.org/)** - Listo para tipado estático (sin fuentes `.ts` todavía; ver nota en "Calidad de Código")
 - ✅ **[Vitest](https://vitest.dev/)** - Framework de testing ultrarrápido
 - 🎭 **[@testing-library/preact](https://testing-library.com/docs/preact-testing-library/intro/)** - Testing de componentes
 - 🧹 **[ESLint](https://eslint.org/)** + **[Prettier](https://prettier.io/)** - Linting y formateo
@@ -107,6 +107,11 @@ npm run typecheck
 npm run test
 ```
 
+> **Nota sobre `typecheck`:** el proyecto es TypeScript-ready (`tsconfig.json` con `allowJs`), pero
+> hoy no hay fuentes `.ts`/`.tsx` y `checkJs` está desactivado, por lo que `tsc --noEmit` no
+> reporta errores reales todavía. El gate se activa solo cuando se agregan archivos `.ts`/`.tsx`
+> o se habilita `checkJs`.
+
 ## 🧭 Guía Operativa: AGENTS + Skills
 
 Este repositorio usa una capa de reglas operativas para mantener cambios consistentes entre app desktop, renderer y CLI.
@@ -136,7 +141,7 @@ Este repositorio usa una capa de reglas operativas para mantener cambios consist
 
 ### Requisitos Previos
 
-- **Node.js** v22.0.0 o superior (requerido). Usamos Node 22 para alinear con Electron 35 y evitar rebuilds de nativos. Incluimos `.nvmrc` y `.node-version` para fijar versión.
+- **Node.js** v22.12.0 o superior (requerido). Usamos Node 22.12+ para cumplir el mínimo de Electron 43 y evitar rebuilds inconsistentes de módulos nativos. Incluimos `.nvmrc` y `.node-version` para fijar la base soportada.
 - **npm** v8.0.0 o superior
 - **Git** (recomendado)
 
@@ -149,9 +154,6 @@ cd Athenea-Desktop
 
 # 2. Instalar dependencias
 npm install
-
-# 3. (Opcional) Configurar variables de entorno
-cp .env.example .env
 ```
 
 ---
@@ -243,7 +245,7 @@ athenea/
 
 ## 🔒 Seguridad
 
-- **Credenciales:** Almacenadas de forma segura con `keytar` usando el keychain del sistema operativo
+- **Credenciales:** Cifradas con `safeStorage` (Electron) usando el almacén de claves del sistema operativo
 - **Context isolation:** Habilitado para proteger el proceso renderer
 - **Preload script:** Expone solo APIs necesarias de forma controlada (window.electronAPI)
 - **Code signing:** Configurado para Windows (ajustar según necesidad)
@@ -283,7 +285,7 @@ Reemplazalos por tus assets finales manteniendo los mismos nombres/rutas.
 
 ### Favicon del renderer (Vite)
 
-- `src/renderer/index.html` referencia `./public/vite.svg`
+- `src/renderer/index.html` referencia `/vite.svg`
 
 ---
 
