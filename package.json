@@ -6,7 +6,7 @@
   "type": "module",
   "main": "./out/main/index.js",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "prepare": "husky",
@@ -31,7 +31,6 @@
     "electron-log": "^5.4.3",
     "electron-updater": "^6.6.2",
     "jwt-decode": "^4.0.0",
-    "keytar": "7.9.0",
     "ky": "^1.2.4",
     "pdf-to-printer": "5.6.1",
     "preact": "^10.26.2",
@@ -51,24 +50,24 @@
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "autoprefixer": "^10.4.20",
-    "electron": "^35.1.4",
-    "electron-builder": "^26.0.0",
+    "electron": "^43.1.0",
+    "electron-builder": "^26.15.6",
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "husky": "^9.1.7",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.16",
     "prettier": "^3.6.2",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.9.3",
-    "vite": "^7.2.2",
+    "vite": "^7.3.6",
     "vite-tsconfig-paths": "^5.0.0",
-    "vitest": "^4.0.8"
+    "vitest": "^4.1.10"
   },
   "overrides": {
-    "tar": "7.5.7"
+    "tar": "7.5.19"
   },
   "build": {
     "appId": "com.example.app",

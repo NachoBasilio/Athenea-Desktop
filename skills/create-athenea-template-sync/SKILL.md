@@ -16,7 +16,7 @@ description: Mantener sincronia entre CLI create-athenea-app y su template para 
 - Si cambia un token de template, actualizar `tokenMap` y `replaceTokensInFile` en `create-athenea-app/bin/index.js`.
 - Si cambia estructura del template, revisar rutas hardcodeadas del CLI (por ejemplo `src/main/index.js`, `src/renderer/index.html`).
 - Mantener scripts base del template compatibles con README (`dev`, `build`, `dist`, `pack`).
-- Conservar Node de CLI en `>=18` y Node de template en `>=22`.
+- Conservar Node de CLI en `>=18` y Node de template en `>=22.12.0`.
 
 ## Checklist rapido
 
