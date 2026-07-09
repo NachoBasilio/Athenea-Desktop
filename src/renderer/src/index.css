@@ -7,7 +7,7 @@
 html,
 body {
 	height: 100%;
-	overflow: hidden;
+	overflow-y: auto;
 }
 
 body {
@@ -19,5 +19,5 @@ body {
 }
 
 #app {
-	height: 100%;
+	min-height: 100%;
 }
