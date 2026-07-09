@@ -8,8 +8,8 @@
 ## Contexto real del proyecto
 
 - Monorepo liviano con dos focos: app desktop (`src/`) y CLI generador (`create-athenea-app/`).
-- Stack principal: Electron 35 + electron-vite 5 + Preact + Vite + TypeScript (typecheck) + ESLint.
-- Runtime y build de app desktop en raiz (`package.json`), con Node `>=22`.
+- Stack principal: Electron 43 + electron-vite 5 + Preact + Vite + ESLint. TypeScript-ready: `typecheck` activa validacion real solo cuando existan fuentes `.ts`/`.tsx` o se habilite `checkJs` en `tsconfig.json` (hoy es un gate inactivo).
+- Runtime y build de app desktop en raiz (`package.json`), con Node `>=22.12.0`.
 - CLI publicado como `create-athenea-app` con Node `>=18` en `create-athenea-app/package.json`.
 
 ## Reglas globales verificables
@@ -18,7 +18,7 @@
 - No editar artefactos generados: `out/`, `release/`, `node_modules/`.
 - Mantener coherencia entre `src/main/index.js` (canales IPC) y `src/preload/index.js` (bridge/allowlist).
 - Cualquier cambio en plantilla del CLI debe auditar sincronia con `create-athenea-app/bin/index.js`.
-- Mantener Node 22 para la app de escritorio (`.nvmrc`, `.node-version`, engines de raiz).
+- Mantener Node 22.12.0 o superior para la app de escritorio (`.nvmrc`, `.node-version`, engines de raiz).
 
 ## Convenciones de trabajo
 

@@ -12,6 +12,31 @@ const childWindowsByRoute = new Map();
 
 const settingsPath = path.join(app.getPath("userData"), "settings.json");
 
+/** Origen permitido para navegación (dev server o file:// en producción). */
+function isNavigationAllowed(targetUrl) {
+  try {
+    const target = new URL(targetUrl);
+    if (process.env.ELECTRON_RENDERER_URL) {
+      const devOrigin = new URL(process.env.ELECTRON_RENDERER_URL).origin;
+      return target.origin === devOrigin;
+    }
+    return target.protocol === "file:";
+  } catch {
+    return false;
+  }
+}
+
+/** Bloquea apertura de ventanas nuevas y navegación fuera del origen propio. */
+function hardenWebContents(webContents) {
+  webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+
+  webContents.on("will-navigate", (event, targetUrl) => {
+    if (!isNavigationAllowed(targetUrl)) {
+      event.preventDefault();
+    }
+  });
+}
+
 function createWindow() {
   const { width: screenWidth, height: screenHeight } =
     screen.getPrimaryDisplay().workAreaSize;
@@ -22,7 +47,7 @@ function createWindow() {
     title: __APP_TITLE_JSON__,
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -31,6 +56,8 @@ function createWindow() {
   mainWindow.setMenuBarVisibility(false);
   mainWindow.setAutoHideMenuBar(true);
   mainWindow.maximize();
+
+  hardenWebContents(mainWindow.webContents);
 
   // electron-vite: usa ELECTRON_RENDERER_URL en dev
   if (process.env.ELECTRON_RENDERER_URL) {
@@ -121,7 +148,7 @@ ipcMain.on("window:openRoute", (_event, options) => {
     title: title || __APP_TITLE_JSON__,
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -129,6 +156,9 @@ ipcMain.on("window:openRoute", (_event, options) => {
 
   child.setMenuBarVisibility(false);
   child.setAutoHideMenuBar(true);
+
+  hardenWebContents(child.webContents);
+
   if (mainWindow && !mainWindow.isDestroyed()) {
     child.setParentWindow(mainWindow);
   }
