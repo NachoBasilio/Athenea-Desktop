@@ -1,8 +1,14 @@
-import { app, BrowserWindow, ipcMain, dialog, screen } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  screen,
+  safeStorage,
+} from "electron";
 import path, { join } from "path";
 import fs from "fs";
 import os from "os";
-import keytar from "keytar";
 import pdfPrinter from "pdf-to-printer";
 import { spawn } from "child_process";
 import log from "electron-log";
@@ -17,8 +23,11 @@ const { print: printPDF, getPrinters } = pdfPrinter;
 // Deshabilitar features que causan warnings innecesarios
 app.commandLine.appendSwitch("disable-features", "Autofill");
 
-// En dev (o si viene seteado), deshabilitar sandbox para evitar issues de permisos en Linux
-if (!app.isPackaged || process.env.ELECTRON_DISABLE_SANDBOX === "1") {
+// En dev en Linux, deshabilitar sandbox para evitar issues de permisos
+// (el binario setuid del sandbox suele faltar en entornos de desarrollo Linux).
+// Nunca se aplica en builds empaquetados: el sandbox de producción no debe
+// poder desactivarse mediante variables de entorno.
+if (!app.isPackaged && process.platform === "linux") {
   app.commandLine.appendSwitch("no-sandbox");
 }
 
@@ -26,17 +35,21 @@ if (!app.isPackaged || process.env.ELECTRON_DISABLE_SANDBOX === "1") {
 
 let backendProcess = null;
 
+/** Nombre del binario de backend, sobreescribible vía env var para forks/rebrandeos. */
+const BACKEND_BINARY_NAME =
+  process.env.ATHENEA_BACKEND_BINARY || "athenea-backend";
+
 /** Resuelve la ruta del binario de backend según entorno. */
 function getBackendPath() {
   const isWin = process.platform === "win32";
   const executableName = isWin
-    ? "api_billing_software.exe"
-    : "api_billing_software";
+    ? `${BACKEND_BINARY_NAME}.exe`
+    : BACKEND_BINARY_NAME;
 
   if (app.isPackaged) {
     return path.join(
       process.resourcesPath,
-      "api_billing_software",
+      BACKEND_BINARY_NAME,
       executableName,
     );
   }
@@ -49,7 +62,7 @@ function getBackendPath() {
     "..",
     "backend",
     "dist",
-    "api_billing_software",
+    BACKEND_BINARY_NAME,
     executableName,
   );
 }
@@ -116,6 +129,32 @@ const childWindowsByRoute = new Map();
 
 const settingsPath = path.join(app.getPath("userData"), "settings.json");
 
+/** Origen permitido para navegación (dev server o file:// en producción). */
+function isNavigationAllowed(targetUrl) {
+  try {
+    const target = new URL(targetUrl);
+    if (process.env.ELECTRON_RENDERER_URL) {
+      const devOrigin = new URL(process.env.ELECTRON_RENDERER_URL).origin;
+      return target.origin === devOrigin;
+    }
+    return target.protocol === "file:";
+  } catch {
+    return false;
+  }
+}
+
+/** Bloquea apertura de ventanas nuevas y navegación fuera del origen propio. */
+function hardenWebContents(webContents) {
+  webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+
+  webContents.on("will-navigate", (event, targetUrl) => {
+    if (!isNavigationAllowed(targetUrl)) {
+      log.warn("🚫 Navegación bloqueada hacia:", targetUrl);
+      event.preventDefault();
+    }
+  });
+}
+
 /** Crea ventana principal, carga renderer y sincroniza eventos hijo/padre. */
 function createWindow() {
   const { width: screenWidth, height: screenHeight } =
@@ -127,7 +166,7 @@ function createWindow() {
     title: "App",
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -136,6 +175,8 @@ function createWindow() {
   mainWindow.setMenuBarVisibility(false);
   mainWindow.setAutoHideMenuBar(true);
   mainWindow.maximize();
+
+  hardenWebContents(mainWindow.webContents);
 
   // electron-vite: usa ELECTRON_RENDERER_URL en dev
   if (process.env.ELECTRON_RENDERER_URL) {
@@ -371,34 +412,92 @@ ipcMain.handle("settings:reset", () => {
   return {};
 });
 
-// ------------------- IPC: SECURE STORE (KEYTAR) -------------------
+// ------------------- IPC: SECURE STORE (safeStorage) -------------------
 
 const DEFAULT_SERVICE = "athenea";
+
+const secureStorePath = path.join(
+  app.getPath("userData"),
+  "secure-store.json",
+);
+
+function secureStoreKey(service, account) {
+  return `${service}:${account}`;
+}
+
+function readSecureStore() {
+  try {
+    if (!fs.existsSync(secureStorePath)) return {};
+    const raw = fs.readFileSync(secureStorePath, "utf-8");
+    return JSON.parse(raw);
+  } catch (err) {
+    log.error("Error leyendo secure store:", err);
+    return {};
+  }
+}
+
+function writeSecureStore(data) {
+  try {
+    fs.writeFileSync(secureStorePath, JSON.stringify(data, null, 2), "utf-8");
+    return true;
+  } catch (err) {
+    log.error("Error guardando secure store:", err);
+    return false;
+  }
+}
 
 ipcMain.handle(
   "secureStore:getToken",
   async (_event, service = DEFAULT_SERVICE) => {
-    const account = os.userInfo().username;
-    const token = await keytar.getPassword(service, account);
-    return token;
+    try {
+      if (!safeStorage.isEncryptionAvailable()) {
+        log.error("secureStore:getToken - encryption no disponible");
+        return null;
+      }
+      const account = os.userInfo().username;
+      const store = readSecureStore();
+      const encoded = store[secureStoreKey(service, account)];
+      if (!encoded) return null;
+      return safeStorage.decryptString(Buffer.from(encoded, "base64"));
+    } catch (err) {
+      log.error("Error en secureStore:getToken:", err);
+      return null;
+    }
   },
 );
 
 ipcMain.handle(
   "secureStore:setToken",
   async (_event, { service = DEFAULT_SERVICE, token }) => {
-    const account = os.userInfo().username;
-    await keytar.setPassword(service, account, token);
-    return true;
+    try {
+      if (!safeStorage.isEncryptionAvailable()) {
+        log.error("secureStore:setToken - encryption no disponible");
+        return false;
+      }
+      const account = os.userInfo().username;
+      const store = readSecureStore();
+      const encrypted = safeStorage.encryptString(token);
+      store[secureStoreKey(service, account)] = encrypted.toString("base64");
+      return writeSecureStore(store);
+    } catch (err) {
+      log.error("Error en secureStore:setToken:", err);
+      return false;
+    }
   },
 );
 
 ipcMain.handle(
   "secureStore:deleteToken",
   async (_event, service = DEFAULT_SERVICE) => {
-    const account = os.userInfo().username;
-    await keytar.deletePassword(service, account);
-    return true;
+    try {
+      const account = os.userInfo().username;
+      const store = readSecureStore();
+      delete store[secureStoreKey(service, account)];
+      return writeSecureStore(store);
+    } catch (err) {
+      log.error("Error en secureStore:deleteToken:", err);
+      return false;
+    }
   },
 );
 
@@ -486,7 +585,7 @@ ipcMain.on("window:openRoute", (_event, options) => {
     modal: false,
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -494,6 +593,8 @@ ipcMain.on("window:openRoute", (_event, options) => {
 
   child.setMenuBarVisibility(false);
   child.setAutoHideMenuBar(true);
+
+  hardenWebContents(child.webContents);
 
   if (mainWindow && !mainWindow.isDestroyed()) {
     child.setParentWindow(mainWindow);
