@@ -266,6 +266,14 @@ async function main() {
   await fsp.mkdir(targetDir, { recursive: true });
   await fsp.cp(templateDir, targetDir, { recursive: true });
 
+  // npm elimina archivos ".gitignore" al publicar el paquete, por eso el
+  // template lo distribuye como "gitignore" (sin punto) y lo renombramos aca.
+  const gitignoreSrc = path.join(targetDir, "gitignore");
+  const gitignoreDest = path.join(targetDir, ".gitignore");
+  if (fs.existsSync(gitignoreSrc)) {
+    await fsp.rename(gitignoreSrc, gitignoreDest);
+  }
+
   await updateAppPackageJson(targetDir, { npmName, productName, appId });
 
   const tokenMap = {

@@ -1,4 +1,4 @@
-# **APP_TITLE**
+# __APP_TITLE__
 
 Aplicación de escritorio creada con [Athenea](https://github.com/ignadev/Athenea-Desktop).
 
