@@ -34,3 +34,9 @@ npm create athenea-app@latest mi-proyecto
 - **Vite** - Dev server ultra rapido + build optimizado
 - **electron-vite** - Integra Vite con Electron (main + preload + renderer)
 - **electron-builder** - Empaquetado para Windows, macOS, Linux
+- **Zustand** - Gestion de estado minimalista
+- **Ky** - Cliente HTTP ligero
+- **Zod** - Validacion de esquemas
+- **Tailwind CSS** - Framework CSS utility-first
+- **Vitest** + **@testing-library/preact** - Testing de componentes
+- **ESLint** + **Prettier** - Linting y formateo

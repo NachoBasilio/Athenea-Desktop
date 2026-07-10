@@ -15,6 +15,7 @@ export default [
 			'src/preload/**/*.js',
 			'create-athenea-app/bin/**/*.js',
 			'create-athenea-app/template/electron.vite.config.js',
+			'create-athenea-app/template/vitest.config.js',
 			'create-athenea-app/template/src/main/**/*.js',
 			'create-athenea-app/template/src/preload/**/*.js',
 		],
