@@ -11,6 +11,7 @@ export default defineConfig({
 	},
 	test: {
 		environment: 'jsdom',
+		forbidOnly: true,
 		include: ['src/renderer/**/*.{test,spec}.{js,jsx}'],
 	},
 })

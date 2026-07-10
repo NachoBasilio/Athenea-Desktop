@@ -21,7 +21,7 @@ description: Mantener sincronia entre CLI create-athenea-app y su template para 
 ## Checklist rapido
 
 - [ ] Revisar que `bin/index.js` siga copiando `template/` correctamente.
-- [ ] Revisar reemplazo de `__APP_TITLE__`, `__APP_TITLE_JSON__`, `__APP_APP_ID__`.
+- [ ] Revisar reemplazo de `__APP_TITLE_MARKDOWN__`, `__APP_TITLE_HTML__`, `__APP_TITLE_JS_STRING__`, `__APP_APP_ID__`.
 - [ ] Verificar que `package.json` del template siga coherente con `electron.vite.config.js`.
 
 ## Validacion

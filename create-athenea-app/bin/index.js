@@ -37,6 +37,37 @@ function slugify(inputText) {
   return s;
 }
 
+function toSingleQuotedJsString(value) {
+  return `'${String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')}'`;
+}
+
+function toMarkdownHeadingText(value) {
+  return String(value)
+    .replace(/\r\n?/g, "\n")
+    .replace(/\n/g, " ")
+    .replace(/\\/g, "\\\\")
+    .replace(/([`*_{}()#+!<>|])/g, "\\$1")
+    .replace(/\[/g, "\\[")
+    .replace(/\]/g, "\\]");
+}
+
+function escapeHtmlText(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\r/g, '&#13;')
+    .replace(/\n/g, '&#10;');
+}
+
 function assertEmptyDir(dirPath) {
   if (!fs.existsSync(dirPath)) return;
   const entries = fs.readdirSync(dirPath);
@@ -68,7 +99,7 @@ async function updateAppPackageJson(
   pkg.build.productName = productName;
   pkg.build.appId = appId;
 
-  await fsp.writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf8");
+  await fsp.writeFile(pkgPath, JSON.stringify(pkg, null, '\t') + '\n', 'utf8');
 }
 
 // ---------- Asset generator (white placeholders) ----------
@@ -277,8 +308,9 @@ async function main() {
   await updateAppPackageJson(targetDir, { npmName, productName, appId });
 
   const tokenMap = {
-    __APP_TITLE__: productName,
-    __APP_TITLE_JSON__: JSON.stringify(productName),
+    __APP_TITLE_MARKDOWN__: toMarkdownHeadingText(productName),
+    __APP_TITLE_HTML__: escapeHtmlText(productName),
+    __APP_TITLE_JS_STRING__: toSingleQuotedJsString(productName),
     __APP_APP_ID__: appId,
   };
 

@@ -28,8 +28,7 @@ export default [
 				__dirname: 'readonly',
 				require: 'readonly',
 				Buffer: 'readonly',
-				__APP_TITLE__: 'readonly',
-				__APP_TITLE_JSON__: 'readonly',
+				__APP_TITLE_JS_STRING__: 'readonly',
 				__APP_APP_ID__: 'readonly',
 			},
 		},
@@ -104,6 +103,7 @@ export default [
 				clearInterval: 'readonly',
 				location: 'readonly',
 				URLSearchParams: 'readonly',
+				__APP_TITLE_JS_STRING__: 'readonly',
 			},
 		},
 		plugins: {
