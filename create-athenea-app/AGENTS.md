@@ -9,7 +9,7 @@
 
 - Mantener compatibilidad Node `>=18` para el CLI (`create-athenea-app/package.json`).
 - Toda modificacion de `template/` debe auditarse junto con `bin/index.js` para garantizar scaffolding consistente.
-- Mantener placeholders/tokens usados por el CLI (`__APP_TITLE__`, `__APP_TITLE_JSON__`, `__APP_APP_ID__`) en sincronia con el reemplazo de `bin/index.js`.
+- Mantener placeholders/tokens usados por el CLI (`__APP_TITLE_MARKDOWN__`, `__APP_TITLE_HTML__`, `__APP_TITLE_JS_STRING__`, `__APP_APP_ID__`) en sincronia con el reemplazo de `bin/index.js`.
 - No introducir dependencias ni scripts en template que rompan el flujo base (`npm run dev`, `npm run build`, `npm run dist`).
 
 ## Auto-invocacion de skills

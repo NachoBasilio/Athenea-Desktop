@@ -11,6 +11,10 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    include: ["src/renderer/**/*.{test,spec}.{js,jsx}"],
+    forbidOnly: true,
+    include: [
+      "src/renderer/**/*.{test,spec}.{js,jsx}",
+      "create-athenea-app/bin/**/*.{test,spec}.js",
+    ],
   },
 });
