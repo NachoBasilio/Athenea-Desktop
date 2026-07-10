@@ -1,6 +1,4 @@
 import js from '@eslint/js'
-import tsParser from '@typescript-eslint/parser'
-import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import prettier from 'eslint-plugin-prettier'
 import reactHooks from 'eslint-plugin-react-hooks'
 
@@ -10,14 +8,10 @@ export default [
 		files: [
 			'electron.vite.config.js',
 			'vitest.config.js',
-			'scripts/**/*.cjs',
+			'tailwind.config.js',
+			'postcss.config.js',
 			'src/main/**/*.js',
 			'src/preload/**/*.js',
-			'create-athenea-app/bin/**/*.js',
-			'create-athenea-app/template/electron.vite.config.js',
-			'create-athenea-app/template/vitest.config.js',
-			'create-athenea-app/template/src/main/**/*.js',
-			'create-athenea-app/template/src/preload/**/*.js',
 		],
 		languageOptions: {
 			ecmaVersion: 'latest',
@@ -28,60 +22,9 @@ export default [
 				__dirname: 'readonly',
 				require: 'readonly',
 				Buffer: 'readonly',
-				__APP_TITLE__: 'readonly',
-				__APP_TITLE_JSON__: 'readonly',
-				__APP_APP_ID__: 'readonly',
 			},
 		},
 		rules: {
-			'no-undef': 'off',
-		},
-	},
-	{
-		files: ['**/*.ts', '**/*.tsx'],
-		languageOptions: {
-			parser: tsParser,
-			ecmaVersion: 'latest',
-			sourceType: 'module',
-			globals: {
-				window: 'readonly',
-				document: 'readonly',
-				fetch: 'readonly',
-				console: 'readonly',
-				setInterval: 'readonly',
-				clearInterval: 'readonly',
-			},
-			parserOptions: {
-				project: './tsconfig.json',
-			},
-		},
-		plugins: {
-			'@typescript-eslint': typescriptEslint,
-			prettier,
-			'react-hooks': reactHooks,
-		},
-		rules: {
-			...typescriptEslint.configs.recommended.rules,
-			...typescriptEslint.configs['recommended-type-checked'].rules,
-
-			'react-hooks/rules-of-hooks': 'error',
-			'react-hooks/exhaustive-deps': 'warn',
-
-			'prettier/prettier': [
-				'error',
-				{
-					singleQuote: true,
-					semi: false,
-					useTabs: true,
-					tabWidth: 2,
-				},
-			],
-			'@typescript-eslint/no-unused-vars': [
-				'warn',
-				{
-					argsIgnorePattern: '^_',
-				},
-			],
 			'no-undef': 'off',
 		},
 	},

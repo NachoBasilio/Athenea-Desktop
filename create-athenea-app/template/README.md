@@ -8,6 +8,12 @@ Aplicación de escritorio creada con [Athenea](https://github.com/ignadev/Athene
 - **electron-vite** - Build tool optimizado para Electron
 - **Preact** - UI library liviana (3KB)
 - **preact-iso** - Router minimalista
+- **Zustand** - Gestión de estado minimalista
+- **Ky** - Cliente HTTP ligero
+- **Zod** - Validación de esquemas
+- **Tailwind CSS** - Framework CSS utility-first
+- **Vitest** + **@testing-library/preact** - Testing de componentes
+- **ESLint** + **Prettier** - Linting y formateo
 
 ## Estructura
 
@@ -33,6 +39,11 @@ src/
 # Desarrollo
 npm run dev          # Inicia en modo desarrollo (Windows)
 npm run dev:linux    # Inicia en modo desarrollo (Linux)
+
+# Calidad
+npm run lint         # Ejecuta ESLint
+npm run format       # Formatea el código con Prettier
+npm test             # Ejecuta los tests con Vitest
 
 # Build
 npm run build        # Compila la aplicación
