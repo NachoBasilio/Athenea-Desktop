@@ -56,15 +56,9 @@ export default [
 		rules: {
 			'react-hooks/rules-of-hooks': 'error',
 			'react-hooks/exhaustive-deps': 'warn',
-			'prettier/prettier': [
-				'error',
-				{
-					singleQuote: true,
-					semi: false,
-					useTabs: true,
-					tabWidth: 2,
-				},
-			],
+			// Style options live in .prettierrc so JSX files checked by
+			// `npm run lint` use the same formatting rules as `npm run format`.
+			'prettier/prettier': 'error',
 			'no-unused-vars': [
 				'warn',
 				{

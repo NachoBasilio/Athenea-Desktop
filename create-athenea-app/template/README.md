@@ -11,26 +11,36 @@ Aplicación de escritorio creada con [Athenea](https://github.com/ignadev/Athene
 - **Zustand** - Gestión de estado minimalista
 - **Ky** - Cliente HTTP ligero
 - **Zod** - Validación de esquemas
-- **Tailwind CSS** - Framework CSS utility-first
+- **Tailwind CSS** - Preconfigurado para estilos utility-first
 - **Vitest** + **@testing-library/preact** - Testing de componentes
 - **ESLint** + **Prettier** - Linting y formateo
 
 ## Estructura
 
 ```
-src/
-├── main/           # Proceso principal de Electron
-│   └── index.js
-├── preload/        # Scripts de preload (bridge seguro)
-│   └── index.js
-└── renderer/       # Aplicación frontend
-    ├── index.html
-    ├── public/     # Assets estáticos
-    └── src/        # Código fuente React/Preact
-        ├── main.jsx
-        ├── app.jsx
-        ├── components/
-        └── routes/
+.
+├── .prettierrc               # Configuración de Prettier (fuente única de estilo)
+├── electron.vite.config.js   # Configuración de electron-vite
+├── eslint.config.js          # Configuración de ESLint
+├── postcss.config.js         # Configuración de PostCSS
+├── tailwind.config.js        # Configuración de Tailwind CSS
+├── vitest.config.js          # Configuración de Vitest
+└── src/
+    ├── main/           # Proceso principal de Electron
+    │   └── index.js
+    ├── preload/        # Scripts de preload (bridge seguro)
+    │   └── index.js
+    └── renderer/       # Aplicación frontend
+        ├── index.html
+        ├── public/     # Assets estáticos
+        └── src/        # Código fuente Preact
+            ├── main.jsx
+            ├── app.jsx
+            ├── components/     # Componentes con tests colocados
+            │   └── Counter/
+            │       ├── Counter.jsx
+            │       └── Counter.test.jsx
+            └── routes/
 ```
 
 ## Scripts
@@ -59,10 +69,10 @@ El preload expone `window.electronAPI` con:
 
 ```javascript
 // Guardar/leer configuración persistente
-await window.electronAPI.settings.get();
-await window.electronAPI.settings.set({ key: "value" });
+await window.electronAPI.settings.get()
+await window.electronAPI.settings.set({ key: 'value' })
 
 // Abrir ventana secundaria con una ruta específica
-window.electronAPI.window.openRoute("/mi-ruta");
-window.electronAPI.window.openRoute({ route: "/mi-ruta", title: "Mi Ventana" });
+window.electronAPI.window.openRoute('/mi-ruta')
+window.electronAPI.window.openRoute({ route: '/mi-ruta', title: 'Mi Ventana' })
 ```
